@@ -24,7 +24,9 @@ static void DISPLAYFUNC (
 #ifdef ENABLE_SECOND_CONSOLE
 	,u8 * screen2, 
 	u16 zoomX,
-	u16 zoomY
+	u16 zoomY,
+	u16 scrollX,
+	u16 scrollY
 #endif
 	)
 {
@@ -41,7 +43,7 @@ static void DISPLAYFUNC (
 	s16 layersum=0;
 
 #ifdef ENABLE_SECOND_CONSOLE
-	u16 second_console_x=0;
+	u16 second_console_x=scrollX;
 #endif
 	for (x_pos_screen = 0; x_pos_screen < 128; x_pos_screen++
 #ifdef ENABLE_SECOND_CONSOLE
@@ -54,7 +56,7 @@ static void DISPLAYFUNC (
 #endif
 #ifdef ENABLE_SECOND_CONSOLE
 		u8 charpos_second_con = (second_console_x>>11);
-		u16 second_console_y=0;
+		u16 second_console_y=scrollY;
 #endif
 		u8 or_bit=1;
 		s8 propagte_error=0;
@@ -68,54 +70,53 @@ static void DISPLAYFUNC (
 		
 		)
 		{
-			#ifndef PIXEL_CALLBACK
+#ifndef PIXEL_CALLBACK
 			s8 background_pixel=0;
-			#else
+#else
 			s8 background_pixel=PIXEL_CALLBACK (x_pos_screen,y_pos_screen);
-			#endif
+#endif
 			layersum=background_pixel;
-			#ifdef ENABLE_LAYERS
+#ifdef ENABLE_LAYERS
 			if(!layers_constant_counter)
 			{
 				u8 i;
 				for(i=0;i<NR_LAYERS;i++)
 				layers[i].PixelValue += GfxApiLayerGetNextByte(&layers[i]);
-				
 			}
 			else layers_constant_counter--;
 			// change to implement different combination logic for the layers
 			
-			#ifndef LAYERS_COLORKEY
-			#ifndef SUBTRACT_LAYER0
+#ifndef LAYERS_COLORKEY
+#ifndef SUBTRACT_LAYER0
 			layersum+=layers[0].PixelValue>>fade;
-			#else
+#else
 			layersum-=layers[0].PixelValue>>fade;
-			#endif
-			#endif
+#endif
+#endif
 			
-			#ifndef LAYERS_COLORKEY
+#ifndef LAYERS_COLORKEY
 			for(u8 i=1;i<NR_LAYERS;i++)
 			layersum+=layers[i].PixelValue;
-			#else
+#else
 			for(u8 i=0;i<NR_LAYERS;i++)if(layers[i].PixelValue)
 			layersum=layers[i].PixelValue;
-			#endif
+#endif
 			
-			#endif
+#endif
 			
-			#ifdef ENABLE_SPRITES
+#ifdef ENABLE_SPRITES
 			if(!sprites_constant_counter)
 			{
 				u8 i;
 				for(i=0;i<NR_SPRITES;i++)
 				if(GfxApiReadSprite(&Sprites[i]))block_8_px|=or_bit;
 			}else sprites_constant_counter--;
-			#endif
+#endif
 			
-			#ifdef ENABLE_SECOND_CONSOLE
+#ifdef ENABLE_SECOND_CONSOLE
 			if((y_pos_screen>=SECOND_CONSOLE_LINE_START)&&((y_pos_screen>>8)<SECOND_CONSOLE_LINE_END))
 			{
-				u8 the_char = (screen2[charpos_second_con +16* (((y_pos_screen>>8)-SECOND_CONSOLE_LINE_START)>>3)]);
+				u8 the_char = (screen2[charpos_second_con +SECOND_CONSOLE_LINE_LENGTH* (((second_console_y>>8)-SECOND_CONSOLE_LINE_START)>>3)]);
 			
 				if( (os_font[((int)the_char << 3) + ( (second_console_x>>8) & 7)]&(1<<((second_console_y>>8)&7))))
 					block_8_px|=or_bit;
