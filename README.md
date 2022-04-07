@@ -20,9 +20,6 @@ and
 https://www.youtube.com/channel/UC5VMDSmyEacCnnA2sUn5uhw/videos
 
 
-Source Code of Preview 0.2:
-https://github.com/GoergPflug/AttinyStreamGfxApi/edit/
-
 Description of the Demos
 
 
