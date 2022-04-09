@@ -19,6 +19,15 @@ and
 
 https://www.youtube.com/channel/UC5VMDSmyEacCnnA2sUn5uhw/videos
 
+Version History:
+
+0.2		Multiple Consoles
+0.2.1	ASCII Font Support
+		define: ENABLE_FONT_BASIC
+		"Low Quality" Halftoning, saves 64 bytes, faster, for some use cases "low quality" halftoning might even look better
+		define: ENABLE_LOW_QUALITY_HALFTONE
+		Halftoning gets disabled Automatically when not using layers or pixel callback, faster, saves 64 byte
+    
 
 Description of the Demos
 
