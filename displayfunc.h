@@ -1,6 +1,12 @@
 #pragma GCC push_options
 #pragma GCC optimize ("Ofast")
 
+#ifndef ENABLE_LAYERS
+#ifndef PIXEL_CALLBACK
+#define DISABLE_HALFTONE
+#endif
+#endif
+
 #ifndef GfxApiLayerGetNextByteInlineHack
 #define GfxApiLayerGetNextByteInlineHack
 // gcc is too stupid to inline this function..... because it is compiled on O3...
@@ -38,9 +44,14 @@ static void DISPLAYFUNC (
 #endif
 	u8 x_pos_screen;
 	os_gfx_start_display_transfer();
+
+#ifndef DISABLE_HALFTONE
+#ifndef ENABLE_LOW_QUALITY_HALFTONE
 	s8 error_right[64];
 	memset(error_right,0,sizeof(error_right));
+#endif
 	s16 layersum=0;
+#endif
 
 #ifdef ENABLE_SECOND_CONSOLE
 	u16 second_console_x=scrollX;
@@ -70,12 +81,14 @@ static void DISPLAYFUNC (
 		
 		)
 		{
+#ifndef DISABLE_HALFTONE
 #ifndef PIXEL_CALLBACK
 			s8 background_pixel=0;
 #else
 			s8 background_pixel=PIXEL_CALLBACK (x_pos_screen,y_pos_screen);
 #endif
 			layersum=background_pixel;
+#endif
 #ifdef ENABLE_LAYERS
 			if(!layers_constant_counter)
 			{
@@ -124,18 +137,21 @@ static void DISPLAYFUNC (
 			#endif
 
 			
-			
+#ifndef DISABLE_HALFTONE			
 			int s=layersum;
-
 			if(s<0)s=0;
 			if(s>63)s=63;
-			
+#ifndef ENABLE_LOW_QUALITY_HALFTONE			
 			propagte_error+=s+error_right[y_pos_screen];
-			
+#else
+			propagte_error+=s;
+#endif
 			if (propagte_error > 31)block_8_px |= or_bit, propagte_error-=63;// = vpix - 255;
+#ifndef ENABLE_LOW_QUALITY_HALFTONE
 			propagte_error/=2;
 			error_right[y_pos_screen]=propagte_error;
-			
+#endif
+#endif			
 			or_bit<<=1;
 			if(!or_bit)
 			{
@@ -193,4 +209,8 @@ static void DISPLAYFUNC (
 	}   // ende x schleife
 	os_i2c_stop();
 }
+
+#ifdef DISABLE_HALFTONE
+#undef DISABLE_HALFTONE
+#endif
 #pragma GCC pop_options
