@@ -19,6 +19,24 @@ and
 
 https://www.youtube.com/channel/UC5VMDSmyEacCnnA2sUn5uhw/videos
 
+
+*****************If the Display does not work:
+when using arduino try:
+
+change
+#define WIRE_SCREEN_ADDRESS 0x3C
+to
+#define WIRE_SCREEN_ADDRESS 0x3D
+
+
+when using custom i2c change (in tiny_multi_os.h)
+
+#define SSD1306_ADDRESS 0x78
+to
+#define SSD1306_ADDRESS 0x7A
+
+
+
 Version History:
 
 
@@ -37,23 +55,6 @@ Version History:
 0.3		Support C++, Suppport compiling on the Arduino IDE, example C++ Application for Arduino.
 
 0.4		Prelimary Support for Arduino-Wire, performance worse than on attiny85
-
-
-If the Display does not work:
-
-when using arduino try:
-
-change
-#define WIRE_SCREEN_ADDRESS 0x3C
-to
-#define WIRE_SCREEN_ADDRESS 0x3D
-
-
-when using custom i2c change (in tiny_multi_os.h)
-
-#define SSD1306_ADDRESS 0x78
-to
-#define SSD1306_ADDRESS 0x7A
 
 
 
