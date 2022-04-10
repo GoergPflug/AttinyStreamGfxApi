@@ -130,8 +130,8 @@ static void DISPLAYFUNC (
 			if((y_pos_screen>=SECOND_CONSOLE_LINE_START)&&((y_pos_screen>>8)<SECOND_CONSOLE_LINE_END))
 			{
 				u8 the_char = (screen2[charpos_second_con +SECOND_CONSOLE_LINE_LENGTH* (((second_console_y>>8)-SECOND_CONSOLE_LINE_START)>>3)]);
-			
-				if( (os_font[((int)the_char << 3) + ( (second_console_x>>8) & 7)]&(1<<((second_console_y>>8)&7))))
+				const u8 font_block8=pgm_read_byte(&os_font[((int)the_char << 3) + ( (second_console_x>>8) & 7)]);
+				if(font_block8 & (1<<((second_console_y>>8)&7)))
 					block_8_px|=or_bit;
 			}
 			#endif
@@ -160,7 +160,7 @@ static void DISPLAYFUNC (
 				if((y_pos_screen>=CONSOLE_LINE_START)&&(y_pos_screen<CONSOLE_LINE_END))
 				{
 					u8 the_char = (screen[charpos +16* ((y_pos_screen-CONSOLE_LINE_START)>>3)]);
-					block_8_px |= os_font[((int)the_char << 3) + (x_pos_screen & 7)];
+					block_8_px |= pgm_read_byte(&os_font[((int)the_char << 3) + (x_pos_screen & 7)]);
 				}
 				#endif
 				
