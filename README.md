@@ -20,11 +20,10 @@ and
 https://www.youtube.com/channel/UC5VMDSmyEacCnnA2sUn5uhw/videos
 
 Version History:
-0.4		Prelimary Support for Arduino-Wire, performance worse than on attiny85
-0.3		Compatible with C++, compiles in Microchip Studio and Arduino, most samples still untested
-		added .INO example for Arduino
-0.2		
-		Multiple Consoles second Console with Zoom and Softscroll
+
+
+
+0.2		Multiple Consoles second Console with Zoom and Softscroll
 
 0.2.1		
 		ASCII Font Support
@@ -36,6 +35,8 @@ Version History:
 		Halftoning gets disabled Automatically when not using layers or pixel callback, faster, saves 64 byte
 
 0.3		Support C++, Suppport compiling on the Arduino IDE, example C++ Application for Arduino.
+
+0.4		Prelimary Support for Arduino-Wire, performance worse than on attiny85
 
 Description of the Demos
 
