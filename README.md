@@ -32,7 +32,8 @@ Version History:
 		define: ENABLE_LOW_QUALITY_HALFTONE
 		
 		Halftoning gets disabled Automatically when not using layers or pixel callback, faster, saves 64 byte
-    
+
+0.3		Support C++, Suppport compiling on the Arduino IDE, example C++ Application for Arduino.
 
 Description of the Demos
 
