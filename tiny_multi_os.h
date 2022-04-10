@@ -1,4 +1,4 @@
-/* CPKI AttinyGfxApi & TinyMultiOs, Preview Version 0.3
+/* CPKI AttinyGfxApi & TinyMultiOs, Preview Version 0.2.1
 see
 https://www.youtube.com/watch?v=WNJQXsJqSbM
 Copyright (c) 2002
@@ -12,6 +12,7 @@ THIS SOFTWARE IS PROVIDED BY THE Görg Pflug, CPKI Gmbh AND CONTRIBUTORS “AS I
 
 
 Version:
+0.4		Prelimary Support for Arduino-Wire, performance worse than on attiny85
 0.3		Compatible with C++, compiles in Microchip Studio and Arduino, most samples still untested
 		added .INO example for Arduino
 0.2		Multiple Consoles
@@ -105,6 +106,7 @@ const u8 os_font[] __attribute__((progmem)) = {
 };
 #endif
 
+#ifndef ENABLE_WIRE
 static inline void os_i2c_scl_release (void)
 {
 	PORTB |= _BV(PIN_SCL);
@@ -124,27 +126,36 @@ static inline void os_i2c_sda_low (void)
 {
 	USIDR &= ~0x80;
 }
-
+#endif
 static void os_i2c_start (void)
 {
+#ifndef ENABLE_WIRE
 	os_i2c_scl_release();
 	os_i2c_sda_low();
 	os_i2c_scl_low();
 	os_i2c_sda_release();
 
 	USISR = _BV(USISIF);
+#else
+
+#endif
 }
 
 static void os_i2c_stop (void)
 {
+#ifndef ENABLE_WIRE
 	os_i2c_sda_low();
 	os_i2c_scl_release();
 	os_i2c_sda_release();
 	USISR = _BV(USIPF);
+#else
+	Wire.endTransmission();
+#endif
 }
 
 static void os_i2c_write_byte (u8 byte)
 {
+#ifndef ENABLE_WIRE
 	USIDR = byte;
 	USISR = 7;
 	do {
@@ -154,24 +165,39 @@ static void os_i2c_write_byte (u8 byte)
 	}
 	while (USISR & 0x0F);
 	os_i2c_sda_release();
+#else
+	Wire.write(byte);
+#endif
 }
 
 void os_i2c_init (void)
 {
+#ifndef ENABLE_WIRE
 	PORTB = _BV(PIN_SDA) | _BV(PIN_SCL);
 	DDRB  = _BV(PIN_SDA) | _BV(PIN_SCL);
 	USICR = _BV(USIWM1) | _BV(USICLK);
 	os_i2c_scl_release();
 	os_i2c_sda_release();
+#else
+	Wire.begin();
+	Wire.setClock(400000);
+#endif
 }
 
 static void os_i2c_write (const u8 *buf, u8 len)
 {
+#ifndef ENABLE_WIRE
 	os_i2c_start();
 	os_i2c_write_byte(SSD1306_ADDRESS);
 	while (len--)
 		os_i2c_write_byte(*buf++);
 	os_i2c_stop();
+#else
+	Wire.beginTransmission(WIRE_SCREEN_ADDRESS);
+	while (len--)
+		Wire.write(*buf++);
+	Wire.endTransmission();
+#endif
 }
 /*
 FUSES =
@@ -309,6 +335,7 @@ static s8 os_gfx_layer_read_vlc(GfxApiCompressedLayer *g)
 
 static void os_gfx_start_display_transfer()
 {
+#ifndef ENABLE_WIRE
 	os_i2c_start();
 	os_i2c_write_byte(SSD1306_ADDRESS);
 	os_i2c_write_byte(0x0);
@@ -320,6 +347,17 @@ static void os_gfx_start_display_transfer()
 	os_i2c_start();
 	os_i2c_write_byte(SSD1306_ADDRESS);
 	os_i2c_write_byte(0x40);
+#else
+	Wire.beginTransmission(WIRE_SCREEN_ADDRESS);
+	Wire.write(0x0);
+	Wire.write(0xb0);
+	Wire.write(0x21);
+	Wire.write(0x0);
+	Wire.write(0x7f);
+	Wire.endTransmission();
+	Wire.beginTransmission(WIRE_SCREEN_ADDRESS);
+	Wire.write(0x40);
+#endif
 }
 
 void os_init_ssd1306 (void)
