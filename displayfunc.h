@@ -36,6 +36,9 @@ static void DISPLAYFUNC (
 #endif
 	)
 {
+#ifdef ENABLE_WIRE
+	u8 wire_cnt=0;
+#endif
 #ifdef ENABLE_LAYERS
 	u16 layers_constant_counter=0;
 #endif
@@ -206,6 +209,16 @@ static void DISPLAYFUNC (
 				#endif
 			}  // ende 8 pixel block
 		}   // ende y schleife
+#ifdef ENABLE_WIRE
+		wire_cnt++;
+		if (wire_cnt==3)
+		{
+			wire_cnt=0;	
+			Wire.endTransmission();
+			Wire.beginTransmission(WIRE_SCREEN_ADDRESS);
+			Wire.write(0x40);
+		}
+#endif
 	}   // ende x schleife
 	os_i2c_stop();
 }
