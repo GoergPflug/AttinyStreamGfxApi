@@ -16,7 +16,7 @@
 //#define ENABLE_MULTITASK
 #define OS_MAX_TASKS 2
 #define OS_TASK_STACK 384
-#define ENABLE_USERFONT 1
+//#define ENABLE_USERFONT 1
 
 ///////////////////////////////////////////////////////////////////////////////
 //Gfx-Api Configuration
