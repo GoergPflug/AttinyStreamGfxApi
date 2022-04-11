@@ -1,7 +1,7 @@
 # AttinyStreamGfxApi
 Fast Graphics Library for Attiny85 and SSD1306 over I2c
 
-this is a fast datastream-based graphics library for the Attiny85, preview version 0.2, and some examples how to use it.
+this is a fast datastream-based graphics library for the Attiny85, preview version 0.4, and some examples how to use it.
 
 it is primarly based on macros and data structures for layers, sprites, two consoles, the second console has additional features, it can be zoomed and scrolled.
 
