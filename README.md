@@ -140,3 +140,49 @@ The "3D Engine" shows a rotating cube. Primarily the drawing of lines is demonst
 
 "Raycaster" is a port of a simple raycasting engine for the PC. An engine of this type was also used in the original "Wolfenstein 3D".
 
+
+************** Defines to configure the Library:
+
+#define ENABLE_LOW_QUALITY_HALFTONE   // turn on low quality halftoning, saves 64 bytes of ram, looks different, not allways worse
+
+#define ENABLE_ARDUINO_SUPPORT   // <---enable support for Arduino
+
+#define ENABLE_WIRE		// use Wire instead of Speed optimized I2C, the speed optimized I2C is only tested on the Attiny85
+
+#define WIRE_SCREEN_ADDRESS 0x3C    // <----------------set the Display Adress for Wire
+
+#define DISPLAYFUNC Display      // set the name of the function created by #include "displayfunc.h", displayfunc.h can be included multiple times to create more than one function with a different configuration
+
+#define ENABLE_SPRITES // enable the display function to show sprites
+
+#define ENABLE_LAYERS // enable rendering of compressed layers
+
+#define NR_LAYERS 1   // configure the number of layers
+
+#define SUBTRACT_LAYER0  // makes the first layer subtractive instead of additive
+
+#define LAYERS_COLORKEY  // make the layers use colorkeying instead of beeing additive, zero is transparent (see boingball example)
+
+#define ENABLE_SPRITES  // enable rendering of sprites, every sprite is 8 pixels high, x resolution is user defined
+
+#define NR_SPRITES 0  // configure number of sprites
+
+
+#define PIXEL_CALLBACK callbackfunctionname    // define a callback, this function will be called with the current x and y position on the screen, while the engine is rendering, it returns a 6 bit value (0-63) this value is the brightness of the pixel to be drawn
+
+#define ENABLE_CONSOLE   		// enables the first console
+
+#define ENABLE_SECOND_CONSOLE		// enables the second console (see zoom and scroll example), the second console has additional features, it can be zoomed and scrolled, it is slower than the first one
+
+#define CONSOLE_LINE_START 0 // define starting row of the console on screen, 0-7, 0 results in the console starting at x,y=0,0, 1 results in x,y=0,8 
+#define CONSOLE_LINE_END 7 // define the last row of the console on screen 0 is y=0, 1 is y=8 ...
+
+#define SECOND_CONSOLE_LINE_START 0 // define starting row of the console on screen, 0-7, 0 results in the console starting at x,y=0,0, 1 results in x,y=0,8 
+#define SECOND_CONSOLE_LINE_END 7 // define the last row of the console on screen 0 is y=0, 1 is y=8 ...
+
+#define ENABLE_USERFONT 1   // add aditonal chars to the font, the library will include "userfont.h", this file contains the bitmaps of the new chars, binary in rows.
+
+
+
+
+
