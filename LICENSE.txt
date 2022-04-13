@@ -1,6 +1,6 @@
 /* CPKI AttinyGfxApi & TinyMultiOs, Preview Version 0.2.1
 see
-https://www.youtube.com/watch?v=WNJQXsJqSbM
+https://www.youtube.com/watch?v=WNJQXsJqSbM  If your require a different license contact us.
 Copyright (c) 2002
 Görg Pflug & CPKI Gmbh, www.cpki.de . All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
