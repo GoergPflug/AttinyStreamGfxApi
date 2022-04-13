@@ -1,5 +1,5 @@
 # AttinyStreamGfxApi
-Fast Graphics Library for Attiny85 and SSD1306 over I2c
+Fast Graphics Library for Attiny85 and SSD1306 over I2c, it also works on Arduino Boards
 
 this is a fast datastream-based graphics library for the Attiny85, preview version 0.4, and some examples how to use it.
 
