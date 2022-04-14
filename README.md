@@ -3,7 +3,7 @@ Fast Graphics Library for Attiny85 and SSD1306 over I2c, it also works on Arduin
 
 this is a fast datastream-based graphics library for the Attiny85, preview version 0.4, and some examples how to use it.
 
-it is primarly based on macros and data structures for layers, sprites, two consoles, the second console has additional features, it can be zoomed and scrolled. Almost no buffers are used, the library works by directly synthesizing the I2C "Pixel Stream", Resource usage is low, for example the Diagram example uses 29 Bytes and additional 68 bytes stack max. the Raxcaster uses 154 Bytes (about 90 bytes of which are on the stack)
+it is primarly based on macros and data structures for layers, sprites, two consoles, the second console has additional features, it can be zoomed and scrolled. Almost no buffers are used, the library works by directly synthesizing the I2C "Pixel Stream", Resource usage is low, for example the Diagram example uses 29 Bytes and additional 68 bytes stack max. the Raxcaster uses 154 Bytes (about 90 bytes of which are on the stack), most demos should in fact run on an attiny45 (but have not been tested)
 
 layers can be converted from raw image data using a windows tool.
 
