@@ -1,3 +1,27 @@
+/* CPKI AttinyStreamGfxApi & TinyMultiOs, Preview Version 0.2.1
+see
+https://www.youtube.com/watch?v=WNJQXsJqSbM
+Copyright (c) 2002
+Görg Pflug & CPKI Gmbh, www.cpki.de . All rights reserved.
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+All advertising materials mentioning features or use of this software must display the following acknowledgement: “This product includes software developed by the CPKI Gmbh, Görg Pflug and its contributors.”
+Neither the name of the Cpki GmbH nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+THIS SOFTWARE IS PROVIDED BY Görg Pflug, CPKI Gmbh AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
+Version:
+0.4		Prelimary Support for Arduino-Wire, performance worse than on attiny85
+0.3		Compatible with C++, compiles in Microchip Studio and Arduino, most samples still untested
+		added .INO example for Arduino
+0.2		Multiple Consoles
+0.2.1	ASCII Font Support
+		define: ENABLE_FONT_BASIC
+		"Low Quality" Halftoning, saves 64 bytes, faster, for some use cases "low quality" halftoning might even look better
+		define: ENABLE_LOW_QUALITY_HALFTONE
+		Halftoning gets disabled Automatically when not using layers or pixel callback, faster, saves 64 byte
+		
+*/
+
 #pragma GCC push_options
 #pragma GCC optimize ("Ofast")
 
@@ -112,13 +136,30 @@ static void DISPLAYFUNC (
 			
 #ifndef LAYERS_COLORKEY
 			for(u8 i=1;i<NR_LAYERS;i++)
-			layersum+=layers[i].PixelValue;
+				layersum+=layers[i].PixelValue;
 #else
 			for(u8 i=0;i<NR_LAYERS;i++)if(layers[i].PixelValue)
-			layersum=layers[i].PixelValue;
+				layersum=layers[i].PixelValue;
 #endif
 			
 #endif
+
+			
+#ifndef DISABLE_HALFTONE			
+			if(layersum<0)layersum=0;
+			if(layersum>63)layersum=63;
+#ifndef ENABLE_LOW_QUALITY_HALFTONE			
+			propagte_error+=layersum+error_right[y_pos_screen];
+#else
+			propagte_error+=layersum;
+#endif
+			if (propagte_error > 31)block_8_px |= or_bit, propagte_error-=63;
+#ifndef ENABLE_LOW_QUALITY_HALFTONE
+			propagte_error/=2;
+			error_right[y_pos_screen]=propagte_error;
+#endif
+#endif			
+
 			
 #ifdef ENABLE_SPRITES
 			if(!sprites_constant_counter)
@@ -139,22 +180,6 @@ static void DISPLAYFUNC (
 			}
 			#endif
 
-			
-#ifndef DISABLE_HALFTONE			
-			int s=layersum;
-			if(s<0)s=0;
-			if(s>63)s=63;
-#ifndef ENABLE_LOW_QUALITY_HALFTONE			
-			propagte_error+=s+error_right[y_pos_screen];
-#else
-			propagte_error+=s;
-#endif
-			if (propagte_error > 31)block_8_px |= or_bit, propagte_error-=63;// = vpix - 255;
-#ifndef ENABLE_LOW_QUALITY_HALFTONE
-			propagte_error/=2;
-			error_right[y_pos_screen]=propagte_error;
-#endif
-#endif			
 			or_bit<<=1;
 			if(!or_bit)
 			{
@@ -167,26 +192,23 @@ static void DISPLAYFUNC (
 				}
 				#endif
 				
-				
-				
-				
 				os_i2c_write_byte(block_8_px);
 
 				block_8_px = 0;
 				#ifdef ENABLE_LAYERS
 				if(!layers_constant_counter)
 				{
-					u16 min=0xffff;
+					u16 min=layers[0].SkipCounter;
 					u8 i;
-					for(i=0;i<NR_LAYERS;i++)
+					for(i=1;i<NR_LAYERS;i++)
 					{
 						if(layers[i].SkipCounter<min)min=layers[i].SkipCounter;
 					}
-					if(min!=0xffff)
+					if(min)
 					{
 						layers_constant_counter=min;
 						for(i=0;i<NR_LAYERS;i++)
-						layers[i].SkipCounter-=layers_constant_counter;
+							layers[i].SkipCounter-=layers_constant_counter;
 					}
 				}
 				#endif
