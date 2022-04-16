@@ -108,8 +108,8 @@ MainTask()
 		maus.readpos_bit=1;
 		maus.readpos_byte=&mauszeiger[0];
 		maus.sprite_height=sizeof(mauszeiger);
-		maus.zeros=16+(sin_tab[(cnt2*3)&0xff]>>1)+64*(16+sin_tab[(cnt2)&0xff]);
-		if(mode)maus.zeros=0xffff;
+		maus.SkipCounter=16+(sin_tab[(cnt2*3)&0xff]>>1)+64*(16+sin_tab[(cnt2)&0xff]);
+		if(mode)maus.SkipCounter=0xffff;
 		cnt2++;
 		memset(console,0,sizeof(console));
 		if (mode==0)
