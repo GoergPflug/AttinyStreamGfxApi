@@ -1,7 +1,7 @@
 # AttinyStreamGfxApi
 Fast Graphics Library for Attiny85 and SSD1306 over I2c, it also works on Arduino Boards. license: bsd license.
 
-this is a fast datastream-based graphics library for the Attiny85, preview version 0.4, and some examples how to use it.
+this is a fast datastream-based graphics library for the Attiny85, Version 0.8, and some examples how to use it.
 
 it is primarly based on macros and data structures for layers, sprites, two consoles, the second console has additional features, it can be zoomed and scrolled. Almost no buffers are used, the library works by directly synthesizing the I2C "Pixel Stream", Resource usage is low, for example the Diagram example uses 29 Bytes and additional 68 bytes stack max. the Raxcaster uses 154 Bytes (about 90 bytes of which are on the stack), most demos should in fact run on an attiny45 (but have not been tested)
 
@@ -56,8 +56,15 @@ Version History:
 
 0.4		Prelimary Support for Arduino-Wire, performance worse than on attiny85
 
+0.5-0.7		internal
 
-
+0.8		Interleaved I2C, Faster I2C on Attiny, by mixing I2C-transfers with the rendercode, no more waiting for I2C on attiny, 10% faster
+		New integrated Line drawing Logic, Line based 3D 500% faster
+		Helper Functions for calculation of offsets
+		API-Cleanup: Sprite struct changed
+		New Api Functions for filled triangles and lines, adapted samples
+		New Example for filled 3D, see: https://www.youtube.com/shorts/ITSJokLk3jE
+		
 
 Description of the Demos
 
