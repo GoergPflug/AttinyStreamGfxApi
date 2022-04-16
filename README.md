@@ -44,9 +44,13 @@ Version History:
 0.2		Multiple Consoles second Console with Zoom and Softscroll
 
 0.2.1		ASCII Font Support
+		
 		define: ENABLE_FONT_BASIC
+		
 		"Low Quality" Halftoning, saves 64 bytes, faster, for some use cases "low quality" halftoning might even look better
+		
 		define: ENABLE_LOW_QUALITY_HALFTONE
+		
 		Halftoning gets disabled Automatically when not using layers or pixel callback, faster, saves 64 byte
 
 0.3		Support C++, Suppport compiling on the Arduino IDE, example C++ Application for Arduino.
@@ -56,11 +60,17 @@ Version History:
 0.5-0.7		internal
 
 0.8		Interleaved I2C, Faster I2C on Attiny, by mixing I2C-transfers with the rendercode, no more waiting for I2C on attiny, 10% faster
+
 		New integrated Line drawing Logic, Line based 3D 500% faster
+	
 		Helper Functions for calculation of offsets
+		
 		API-Cleanup: Sprite struct changed
+		
 		New Api Functions for filled triangles and lines, adapted samples
+		
 		New Example for filled 3D, see: https://www.youtube.com/shorts/ITSJokLk3jE
+		
 		Affine Transformation "Mode7" for secondary console allows rotation and shearing see: https://www.youtube.com/shorts/MPjAXqZMenM
 		
 
