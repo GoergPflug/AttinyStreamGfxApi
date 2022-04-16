@@ -1,5 +1,5 @@
 # AttinyStreamGfxApi
-Fast Graphics Library for Attiny85 and SSD1306 over I2c, it also works on Arduino Boards. license: bsd license.
+Fast Graphics Library for Attiny85 and Aduino with SSD1306 over I2c, it also works on Arduino Boards. license: bsd license.
 
 this is a fast datastream-based graphics library for the Attiny85, Version 0.8, and some examples how to use it.
 
