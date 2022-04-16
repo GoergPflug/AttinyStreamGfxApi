@@ -2,13 +2,13 @@
 see
 https://www.youtube.com/watch?v=WNJQXsJqSbM
 Copyright (c) 2002
-G√∂rg Pflug & CPKI Gmbh, www.cpki.de . All rights reserved.
+Gˆrg Pflug & CPKI Gmbh, www.cpki.de . All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-All advertising materials mentioning features or use of this software must display the following acknowledgement: ‚ÄúThis product includes software developed by the CPKI Gmbh, G√∂rg Pflug and its contributors.‚Äù
+All advertising materials mentioning features or use of this software must display the following acknowledgement: ìThis product includes software developed by the CPKI Gmbh, Gˆrg Pflug and its contributors.î
 Neither the name of the Cpki GmbH nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-THIS SOFTWARE IS PROVIDED BY G√∂rg Pflug, CPKI Gmbh AND CONTRIBUTORS ‚ÄúAS IS‚Äù AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
+THIS SOFTWARE IS PROVIDED BY THE Gˆrg Pflug, CPKI Gmbh AND CONTRIBUTORS ìAS ISî AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
 
 Version:
@@ -45,12 +45,74 @@ Version:
 #define PIN_SDA  0
 #define PIN_SCL 2
 
+// helper function, Calculate Skip Counter from x,y coord
+static inline GfxApiPosition(unsigned char x, unsigned char y)
+{
+	return x*64+y;
+}
+
+
+#ifdef ENABLE_LINEDRAWING
+u8 _gfx_linepos= 0;
+#ifdef ENABLE_TRIANGLES
+u8 _gfx_tripos=0;
+#endif
+#ifndef NR_TRIS
+#define NR_TRIS 0
+#endif
+static unsigned char _gfx_points_of_lines[4 * NR_LINES+ 8 * NR_TRIS];
+
+
+// Start storage of Line Points
+static void GfxApiBeginLines()
+{
+	_gfx_linepos=0;
+}
+#ifdef ENABLE_TRIANGLES
+static void GfxApiBeginTriangles()
+{
+	_gfx_tripos=0;
+}
+#endif
+
+#define swapu8(x,y) { u8 tmp=x;x=y;y=tmp; }
+void reorder_lines()
+{
+	u8 i;
+	for(i=0;i<_gfx_linepos;i+=4)
+	{
+		if(_gfx_points_of_lines[i]>_gfx_points_of_lines[i+2])
+		{
+			swapu8(_gfx_points_of_lines[i],_gfx_points_of_lines[i+2]);
+			swapu8(_gfx_points_of_lines[i+1],_gfx_points_of_lines[i+3]);
+		}
+	}
+}
+
+static void GfxApiStoreLinePoint(unsigned char x1, unsigned char y1)
+{
+	_gfx_points_of_lines[_gfx_linepos] = x1;
+	_gfx_points_of_lines[_gfx_linepos+1] = y1;
+	_gfx_linepos += 2;
+}
+#ifdef ENABLE_TRIANGLES
+static void GfxApiStoreTrianglePoint(unsigned char x1, unsigned char y1)
+{
+	_gfx_points_of_lines[_gfx_linepos+_gfx_tripos] = x1;
+	_gfx_points_of_lines[_gfx_linepos+1+_gfx_tripos] = y1;
+	_gfx_tripos += 2;
+}
+#endif
+static unsigned char _cur_seg=0;
+#endif
+
+
 void ApiIntToHex(u16 in, u8 *out);
 u8 ApiCharToFontIndex(u8 c);
 
 typedef struct GfxApiSprite
 {
-	u16 zeros;
+	u16 SkipCounter;
 	u8 readpos_bit;
 	u16 readpos_byte;
 	u8 sprite_height;
@@ -75,7 +137,12 @@ void os_i2c_init (void);
 static void os_i2c_write (const u8 *buf, u8 len);
 
 #ifdef ENABLE_CONSOLE
-
+#define FONT
+#endif
+#ifdef ENABLE_SECOND_CONSOLE
+#define FONT
+#endif
+#ifdef FONT
 const u8 os_font[] __attribute__((progmem)) = {
 #ifdef ENABLE_FONT_BASIC
 // source https://raw.githubusercontent.com/dhepper/font8x8/master/font8x8_basic.h , public domain
@@ -98,6 +165,7 @@ const u8 os_font[] __attribute__((progmem)) = {
 	2,0,0,62,64,64,64,64,62,0,0,30,32,64,64,32,30,0,0,62,64,32,32,64,
 	62,0,0,66,36,24,24,36,66,0,2,4,8,112,8,4,2,0,0,66,98,82,74,70,66,0,
 #undef HAVE_FONT
+#undef FONT 
 #endif	
 
 #ifdef ENABLE_USERFONT
@@ -153,6 +221,7 @@ static void os_i2c_stop (void)
 #endif
 }
 
+
 static void os_i2c_write_byte (u8 byte)
 {
 #ifndef ENABLE_WIRE
@@ -164,7 +233,8 @@ static void os_i2c_write_byte (u8 byte)
 		USICR |= _BV(USICLK);
 	}
 	while (USISR & 0x0F);
-	os_i2c_sda_release();
+	
+	USIDR |= 0x80;   // = os_i2c_sda_release();
 #else
 	Wire.write(byte);
 #endif
@@ -228,18 +298,67 @@ u8 ApiCharToFontIndex(u8 c)
 	return 0;
 	#endif
 }
+#define SystemServer_WriteToScreen GfxApiWriteToConsole
+// for compatibility until all demos are fixed
 
-extern void SystemServer_WriteToScreen(const char *txt, u8 *screen, u8 x, u8 y)
+extern void GfxApiWriteToConsole(const char *txt, u8 *screen, u8 x, u8 y)
 {
 	int p = x + 16 * y;
 	int l = strlen(txt);
 	int i;
 	for (i = 0; i < l; i++)screen[(i + p) & 0x7f] = ApiCharToFontIndex(txt[i]);
 }
+#ifdef ENABLE_LINEDRAWING
+void _reorder_lines()
+{
+	u8 i;
+	for(i=0;i<_gfx_linepos;i+=4)
+	{
+		if(_gfx_points_of_lines[i]>_gfx_points_of_lines[i+2])
+		{
+			swapu8(_gfx_points_of_lines[i],_gfx_points_of_lines[i+2]);
+			swapu8(_gfx_points_of_lines[i+1],_gfx_points_of_lines[i+3]);
+		}
+	}
+}
+#endif
 
 #pragma GCC push_options
 #pragma GCC optimize ("Ofast")
-static u8 os_gfx_read_bit(GfxApiCompressedLayer *g)
+#ifndef ENABLE_WIRE
+static inline void __attribute__((always_inline)) one_i2c_bit_byte (u8 byte)
+{
+	USIDR = byte;
+	USISR = 7;
+}
+
+
+static inline __attribute__((always_inline)) void one_i2c_bit_1()
+{
+	 asm volatile("nop");
+	 asm volatile("nop");
+	 asm volatile("nop");
+	 asm volatile("nop");
+
+	// os_i2c_scl_release
+	//PORTB |= _BV(PIN_SCL);
+	//	os_i2c_scl_low();
+	PORTB &= ~_BV(PIN_SCL);
+	USICR |= _BV(USICLK);
+}
+
+
+static inline __attribute__((always_inline)) void one_i2c_bit_0()
+{
+	// os_i2c_scl_release
+	PORTB |= _BV(PIN_SCL);
+	//	os_i2c_scl_low();
+	//	PORTB &= ~_BV(PIN_SCL);
+	//	USICR |= _BV(USICLK);
+
+}
+#endif
+static u8 os_gfx_read_bit (GfxApiCompressedLayer *g)
 {
 	u8 ret = pgm_read_byte(g->BytePos)&g->Bitpos;
 	g->Bitpos <<= 1;
@@ -249,20 +368,20 @@ static u8 os_gfx_read_bit(GfxApiCompressedLayer *g)
 
 static u8 GfxApiReadSprite(GfxApiSprite *s)
 {
-	if(s->zeros)
+	if(s->SkipCounter)
 	{
-		s->zeros--;
+		s->SkipCounter--;
 		return 0;
 	}
 	u8 ret=pgm_read_byte(s->readpos_byte)&s->readpos_bit;
 	s->readpos_bit<<=1;
 	if(!s->readpos_bit)
 	{
-		s->zeros=(64-8);
+		s->SkipCounter=(64-8);
 		s->readpos_bit=1;
 		s->readpos_byte++;
 		s->sprite_height--;
-		if(!s->sprite_height)s->zeros=0x7fff;
+		if(!s->sprite_height)s->SkipCounter=0x7fff;
 	}
 	return ret;
 }
