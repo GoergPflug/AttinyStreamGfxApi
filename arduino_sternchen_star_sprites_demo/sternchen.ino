@@ -89,7 +89,7 @@ void loop() {
     {
       y[i]++;
       if(y[i]>58)y[i]=0,x[i]=rand()%120;
-      sprites[i].zeros=y[i]+x[i]*64;
+      sprites[i].SkipCounter=y[i]+x[i]*64;
       sprites[i].readpos_bit=1;
       sprites[i].readpos_byte=&sternchen[0];
       sprites[i].sprite_height=sizeof(sternchen);
