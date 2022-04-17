@@ -72,7 +72,8 @@ Version History:
 .		New Example for filled 3D, see: https://www.youtube.com/shorts/ITSJokLk3jE
 		
 .		Affine Transformation "Mode7" for secondary console allows rotation and shearing see: https://www.youtube.com/shorts/MPjAXqZMenM
-		
+
+0.8.1		Support Clipping for Lines and Triangles, API-Change: Center of Screen is at 128,128 instead of 64,32 
 
 Description of the Demos
 
