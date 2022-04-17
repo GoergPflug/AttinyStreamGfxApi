@@ -44,8 +44,8 @@
 
 
 //#pragma GCC optimize ("Ofast")
-#define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 64
+#define SCREEN_WIDTH 256
+#define SCREEN_HEIGHT 256
 #define NUM_OF_INDICES 12
 #define SCREEN_CENTER_X  (SCREEN_WIDTH / 2)
 #define SCREEN_CENTER_Y  (SCREEN_HEIGHT / 2)
