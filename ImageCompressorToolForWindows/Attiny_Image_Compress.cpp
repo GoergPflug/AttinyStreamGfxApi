@@ -1,6 +1,7 @@
 // ConsoleApplication9_stretchdibbits.cpp : Diese Datei enthält die Funktion "main". Hier beginnt und endet die Ausführung des Programms.
 //
-
+#undef UNICODE
+#undef _UNICODE
 char filename[256];
 
 #define _CRT_SECURE_NO_WARNINGS
@@ -8,6 +9,9 @@ char filename[256];
 
 #include <windows.h>
 #include <math.h>
+#include <atlimage.h>
+
+
 
 int bitpos = 0;
 
@@ -235,27 +239,72 @@ void decode_image()
 	}
 }
 */
+CImage *img;
+unsigned char GetGrayscale(COLORREF cr)
+{
+	unsigned char byColor;
+
+	byColor =
+		(GetRValue(cr) * 0.30) +
+		(GetGValue(cr) * 0.59) +
+		(GetBValue(cr) * 0.11);
+	return byColor;
+}
 int main(int argc, char *argv[])
 {
+	img = new CImage();
+	
+
 	if (argc != 6) {
-		printf("usage AttinyImageCompress inputfile.raw tolerance rightshift negation maxZero\r\n");
+		printf("usage AttinyImageCompress inputfile.png /.jpg /.gif /.bmp tolerance rightshift negation maxZero\r\n");
 		printf("inputfile  : raw image data 8bit, 64x128 resolution\r\n");
 		printf("tolerance  : accept an error of n in the outputdata, increases compression, decrease quality, use: 0\r\n");
 		printf("rightshift : shift image n bits to the right, use: 0\r\n");
 		printf("negation   : negate output delta, untested, use: 0\r\n");
 		printf("maxZero    : minimum Numbers of Zeros to join to a block, use: 17 (!) ");
-		printf("Example: AttinyImageCompress myImage.raw 0 0 0 17\r\n");
+		printf("Example: AttinyImageCompress myImage.png 0 0 0 17\r\n");
 		exit(0);
 	}
 	sprintf(filename, argv[1]);
-
+	/*
 	FILE *ff = fopen(filename, "rb");
 	if (!ff)
 	{
 		printf("File not Found!\r\n");
 		return 0;
 	}
-	fread(image, 64, 128, ff);
+	*/
+
+	int res=img->Load(filename);
+	if (img->IsNull())
+	{
+		printf("could not load image!\r\n");
+		exit(0);
+	}
+	
+	int depth = img->GetBPP();
+	int xres = img->GetWidth();
+	int yres = img->GetHeight();
+	if (xres != 64)
+	{
+		printf("image resolution must be 64 x 128 but it is %d x %d\r\n", xres, yres);
+		exit(0);
+	}
+	if (yres != 128)
+	{
+		printf("image resolution must be 64 x 128 but it is %d x %d\r\n", xres, yres);
+		exit(0);
+	}
+
+	for(int x=0;x<64;x++)
+		for (int y = 0; y < 128; y++)
+		{
+			COLORREF c = img->GetPixel(x, y);
+			image[x + 64 * y] = GetGrayscale(c);
+		}
+
+
+	//fread(image, 64, 128, ff);
 	
 	sprintf(filename,"%s.h", argv[1]);
 	negate = atoi(argv[4]);
