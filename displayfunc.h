@@ -60,6 +60,9 @@ static inline s8  __attribute__((always_inline)) GfxApiLayerGetNextByte (GfxApiC
 
 void _setpixel(u8 x,u8 y,u8 *linebuffer)
 {
+	y-=96;
+	if(y&(~63))return;//y-clipping
+
 	unsigned char x_seg = x & 0xf8;
 	if (x_seg != _cur_seg)
 	return;
@@ -71,7 +74,7 @@ void _setpixel(u8 x,u8 y,u8 *linebuffer)
 static unsigned char _need_clear=1;//,_clear_start=0,_clear_end=0;
 // Bresenham
 static inline void _line(u8 x0, u8 y0, u8 x1, u8 y1,unsigned char *linebuffer) {
-	
+
 	if((x0&0xf8)>_cur_seg+7) return ; // links grösser als cur seg... raus...
 	if((x1&0xf8)<_cur_seg) return ; // rechts ist kleiner als das akute segment....raus...die linie
 	// kann das segment nicht schneiden
@@ -91,6 +94,8 @@ static inline void _line(u8 x0, u8 y0, u8 x1, u8 y1,unsigned char *linebuffer) {
 
 
 static inline void _hline(u8 x0, u8 y0, u8 x1, u8 y1,u8 c, u8 *linebuffer) {
+	y0-=96;
+	if(y0&(~63))return;//y-clipping
 	if((x0&0xf8)>_cur_seg+7) return ; // links grösser als cur seg... raus...
 	if((x1&0xf8)<_cur_seg) return ; // rechts ist kleiner als das akute segment....raus...die linie
 	// kann das segment nicht schneiden
@@ -412,7 +417,6 @@ static void DISPLAYFUNC (
 	{
 #ifdef ENABLE_LINEDRAWING
 	   u8 line_cur_bit = 1<<(x_pos_screen&7);
-	   _cur_seg=x_pos_screen&0xf8;
 	   if((x_pos_screen&7)==0)
 	   {  // clear linebuffer for 8x64 block and fill with lines
 		   if(_need_clear)
@@ -421,7 +425,7 @@ static void DISPLAYFUNC (
 			   memset(linebuffer, 0,64);
 			//   _clear_start=64,_clear_end=0;
 		   }
-		   _cur_seg=x_pos_screen&0xf8;
+		   _cur_seg=(x_pos_screen&0xf8)+64;
 		   
  		   for(u8 i=0;i<_gfx_linepos;i+=4)
 	  		   _line(_gfx_points_of_lines[i], _gfx_points_of_lines[i+1], _gfx_points_of_lines[i+2], _gfx_points_of_lines[i+3],linebuffer);
