@@ -75,6 +75,8 @@ Version History:
 
 0.8.1		Support Clipping for Lines and Triangles, API-Change: Center of Screen is at 128,128 instead of 64,32 
 
+0.8.2		Support Video Codec, Support font replacement for Vector Quantization
+
 Description of the Demos
 
 
