@@ -1,7 +1,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-/* CPKI AttinyStreamGfxApi & TinyMultiOs, Version 0.8.1
+/* CPKI AttinyStreamGfxApi & TinyMultiOs, Version 0.8.2
 see
 https://www.youtube.com/watch?v=WNJQXsJqSbM
 Copyright (c) 2002
@@ -32,8 +32,9 @@ Version:
 #define INTERLEAVE
 #endif
 #pragma GCC push_options
+#ifndef DISABLE_OFAST
 #pragma GCC optimize ("Ofast")
-
+#endif
 #ifndef ENABLE_LAYERS
 #ifndef PIXEL_CALLBACK
 #define DISABLE_HALFTONE
