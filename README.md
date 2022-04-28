@@ -173,7 +173,7 @@ Defines to configure the Library:
 
 #define WIRE_SCREEN_ADDRESS 0x3C    // <----------------set the Display Adress for Wire
 
-#define DISPLAYFUNC Display      // set the name of the function created by #include "displayfunc.h", displayfunc.h can be included multiple times to create more than one function with a different configuration
+#define DISPLAYFUNC Display      // set the name of the function created by #include "displayfunc.h", displayfunc.h can be included multiple times to create more than one function with a different configuration. 
 
 #define ENABLE_SPRITES // enable the display function to show sprites
 
@@ -189,8 +189,15 @@ Defines to configure the Library:
 
 #define NR_SPRITES 0  // configure number of sprites
 
+#define ENABLE_LINES // Enable Line drawing API (see 3d Cube example how to use)
 
-#define PIXEL_CALLBACK callbackfunctionname    // define a callback, this function will be called with the current x and y position on the screen, while the engine is rendering, it returns a 6 bit value (0-63) this value is the brightness of the pixel to be drawn
+#define ENABLE_TRIANGLES // Enable Triangel drawing API
+
+#define NR_LINES nr // Reserve Memory for storage of Lines
+
+#define NR_TRIANGLES nr // reserve Memory for Triangle Points, "color", and 1 byte per Triangle which can be used for Dept Sorting
+
+#define PIXEL_CALLBACK callbackfunctionname    // define a callback, this function will be called with the current x and y position on the screen, while the engine is rendering, it returns a 6 bit value (0-63) this value is the brightness of the pixel to be drawn. The Callback function will be called for every pixel, first for x,y=(0,0) then for (0,1) to (0,63) then x will increase to 1, so it will be called for x,y=(1,0) and so on.
 
 #define ENABLE_CONSOLE   		// enables the first console
 
@@ -201,12 +208,65 @@ Defines to configure the Library:
 
 #define SECOND_CONSOLE_LINE_START 0 // define starting row of the console on screen, 0-7, 0 results in the console starting at x,y=0,0, 1 results in x,y=0,8 
 #define SECOND_CONSOLE_LINE_END 7 // define the last row of the console on screen 0 is y=0, 1 is y=8 ...
-
+#define ENABLE_SECOND_CONSOLE_AFFINE  // Enable affine transformations on the second console, this can be used to rotate or shear the console, see console rotation example for usage
 #define ENABLE_USERFONT 1   // add aditonal chars to the font, the library will include "userfont.h", this file contains the bitmaps of the new chars, binary in rows.
 
 #define ENABLE_DARKER_SCREEN // alternative Initalization to make the Display less bright
 
 #ifdef ENABLE_FONT_BASIC // Support full ASCII Charset on Console
+
+Display Function
+=================
+
+Some of the Defines will change the API of the Display Function, and add aditional Parameters:
+
+static void DISPLAYFUNC (
+	GfxApiCompressedLayer * layers, 
+	u8 fade, 
+	GfxApiSprite * Sprites, 
+	u8 * screen
+#ifdef ENABLE_SECOND_CONSOLE
+	,u8 * screen2, 
+	s16 zoomX,
+	s16 zoomY,
+	s16 scrollX,
+	s16 scrollY
+#endif
+#ifdef ENABLE_SECOND_CONSOLE_AFFINE
+	,s16 zoomX2,
+	s16 zoomY2
+#endif
+
+GFX-API Functions
+============
+
+static inline GfxApiPosition(unsigned char x, unsigned char y)  <---- Helper Function to Calculate a Position on the Screen from X,Y Coordinate, usefull for placing Sprites and Layers
+
+static void GfxApiBeginLines()  <---- Start storage of Line Points
+
+static void GfxApiStoreLinePoint(unsigned char x1, unsigned char y1)  <------ Store a Point of a Line, call this Function 2 times to draw a Line, GfxApiBeginLines must be called before the first call to this function, but only ONCE per Frame
+***Example: Draw a Line from 10,10 to 20,30 
+
+GfxApiStoreLinePoint (10,10);
+GfxApiStoreLinePoint (20,30);
+
+***All Lines must be stored before calling the Triangle API
+
+static void GfxApiBeginTriangles() <---- Start storage of Triangle Coordinates and Color & Depth Information
+
+static void GfxApiStoreTrianglePoint(unsigned char x1, unsigned char y1)  <---- Store A Triangle Point
+***Example:
+
+Draw a Triangle from 10,10 to 0,20 to 30,30, completly filled, depth 20, also see the Filled 3d Example
+
+GfxApiStoreTrianglePoint(10,10);  // Point A
+GfxApiStoreTrianglePoint(0,20);   // Point B
+GfxApiStoreTrianglePoint(30,30);  // Point C
+GfxApiStoreTrianglePoint(0xff,20); // 0xff is the Pattern to fill the triangle, 20 is a additional byte which can be used for depth sorting.
+
+
+
+
 
 
 
