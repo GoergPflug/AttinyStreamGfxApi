@@ -1,4 +1,4 @@
-/* CPKI AttinyGfxApi & TinyMultiOs, Preview Version 0.2.1
+/* CPKI AttinyGfxApi & TinyMultiOs, Preview Version 0.8.2
 see
 https://www.youtube.com/watch?v=WNJQXsJqSbM
 Copyright (c) 2002
@@ -10,17 +10,6 @@ All advertising materials mentioning features or use of this software must displ
 Neither the name of the Cpki GmbH nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 THIS SOFTWARE IS PROVIDED BY THE Görg Pflug, CPKI Gmbh AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 
-
-Version:
-0.4		Prelimary Support for Arduino-Wire, performance worse than on attiny85
-0.3		Compatible with C++, compiles in Microchip Studio and Arduino, most samples still untested
-		added .INO example for Arduino
-0.2		Multiple Consoles
-0.2.1	ASCII Font Support
-		define: ENABLE_FONT_BASIC
-		"Low Quality" Halftoning, saves 64 bytes, faster, for some use cases "low quality" halftoning might even look better
-		define: ENABLE_LOW_QUALITY_HALFTONE
-		Halftoning gets disabled Automatically when not using layers or pixel callback, faster, saves 64 byte
 		
 */
 
@@ -33,7 +22,6 @@ Version:
 #include <avr/boot.h>
 #include <avr/interrupt.h>
 #include <string.h>
-
 
 #define s8 signed char
 #define u8 unsigned char
@@ -484,32 +472,79 @@ static void os_gfx_start_display_transfer()
 	Wire.write(0x40);
 #endif
 }
+/** Set Lower Column Start Address for Page Addressing Mode. */
+#define SSD1306_SETLOWCOLUMN 0x00
+/** Set Higher Column Start Address for Page Addressing Mode. */
+#define SSD1306_SETHIGHCOLUMN 0x10
+/** Set Memory Addressing Mode. */
+#define SSD1306_MEMORYMODE 0x20
+/** Set display RAM display start line register from 0 - 63. */
+#define SSD1306_SETSTARTLINE 0x40
+/** Set Display Contrast to one of 256 steps. */
+#define SSD1306_SETCONTRAST 0x81
+/** Enable or disable charge pump.  Follow with 0X14 enable, 0X10 disable. */
+#define SSD1306_CHARGEPUMP 0x8D
+/** Set Segment Re-map between data column and the segment driver. */
+#define SSD1306_SEGREMAP 0xA0
+/** Resume display from GRAM content. */
+#define SSD1306_DISPLAYALLON_RESUME 0xA4
+/** Force display on regardless of GRAM content. */
+#define SSD1306_DISPLAYALLON 0xA5
+/** Set Normal Display. */
+#define SSD1306_NORMALDISPLAY 0xA6
+/** Set Inverse Display. */
+#define SSD1306_INVERTDISPLAY 0xA7
+/** Set Multiplex Ratio from 16 to 63. */
+#define SSD1306_SETMULTIPLEX 0xA8
+/** Set Display off. */
+#define SSD1306_DISPLAYOFF 0xAE
+/** Set Display on. */
+#define SSD1306_DISPLAYON 0xAF
+/**Set GDDRAM Page Start Address. */
+#define SSD1306_SETSTARTPAGE 0XB0
+/** Set COM output scan direction normal. */
+#define SSD1306_COMSCANINC 0xC0
+/** Set COM output scan direction reversed. */
+#define SSD1306_COMSCANDEC 0xC8
+/** Set Display Offset. */
+#define SSD1306_SETDISPLAYOFFSET 0xD3
+/** Sets COM signals pin configuration to match the OLED panel layout. */
+#define SSD1306_SETCOMPINS 0xDA
+/** This command adjusts the VCOMH regulator output. */
+#define SSD1306_SETVCOMDETECT 0xDB
+/** Set Display Clock Divide Ratio/ Oscillator Frequency. */
+#define SSD1306_SETDISPLAYCLOCKDIV 0xD5
+/** Set Pre-charge Period */
+#define SSD1306_SETPRECHARGE 0xD9
+/** Deactivate scroll */
+#define SSD1306_DEACTIVATE_SCROLL 0x2E
+/** No Operation Command. */
+#define SSD1306_NOP 0XE3
 
 void os_init_ssd1306 (void)
 {
-	// new init, much more brightness
-	const u8 init1306[] = {
-		0x0,0x20, 1 /*vertical mode*/,0xB0,0xC8,0x00,0x10,0x40,0x81,0x0,0xA1,0xA6,0xA8,0x3F,0xA4,0xD3,0x00,0xD5,0xF0,0xD9,0x22,0xDA,0x12,0xDB,0x20,0x8D, 0x14,0xAF,
-	/*	0xae,
-		0x0, 0x20,1,
-		0xd5,0x80,
-		0xa8,0x3f,
-		0xd3,0,
-		0x8d,0x14,
-		0xda,0x12,
-		0x81,0xcf,
-		0xd9,0xf1,
-		0xdb,0x40,
-	0xa4,0xa6,0xaf
-	*/
+	const u8 init1306[]={
+	 0,
+	 0xAE,
+	 0xD5, 0x80, 
+	 0xA8, 0x3F,        
+	 0xD3, 0x0,     
+	 0x40,        
+	 0x8D, 0x14,  
+	 0x20, 0x01,  
+	 0xA1,        
+	 0xC8,        
+	 0xDA, 0x12,   
+	 0x81, 0x7F,   
+	 0xD9, 0xF1,   
+	 0xDB, 0x40,   
+	 0xA4,
+	 0xA6,
+	 0xAF
 	};
-
-
-	
 //	const u8 init1306[] = {
 	//	0x0,0x20, 1 /*vertical mode*/,0xB0,0xC8,0x00,0x10,0x40,0x81,0x0,0xA1,0xA6,0xA8,0x3F,0xA4,0xD3,0x00,0xD5,0xF0,0xD9,0x22,0xDA,0x12,0xDB,0x20,0x8D, 0x14,0xAF
-//	
-//};
+//	};
 	os_i2c_write(init1306, sizeof(init1306));
 }
 
