@@ -1079,8 +1079,18 @@ done:
 * @param[in] pFileStream: pointer to the file stream to write to.
 * @@Returns S_OK if successful or an error code if not.
 */
+#include <math.h>
+float Convert_sRGB_ToLinear(float thesRGBValue) {
+	return pow(thesRGBValue, 0.89);
+}
+
+int skip_frame=2;
+int skip_frames=2;
 HRESULT store_frame(IMFSample* pSample, int xres, int yres, int stride)
 {
+	skip_frame--;
+	if (skip_frame)return S_OK;
+	skip_frame = skip_frames;
 	IMFMediaBuffer* buf = NULL;
 	DWORD bufLength;
 
@@ -1110,6 +1120,7 @@ HRESULT store_frame(IMFSample* pSample, int xres, int yres, int stride)
 			p *= 4;
 
 			float c = byteBuffer[p] * 0.1 + byteBuffer[p + 1] * 0.6 + byteBuffer[p] * 0.3;
+			c = Convert_sRGB_ToLinear(c/255.0)*255.0;
 			if (c > 255)c = 255;
 			buf_out[x + y * 128 + 128 * 64 * (frames_stored - 1)] = c;
 		}
@@ -1852,10 +1863,10 @@ void compress_video(int frames_chunk)
 		int i;
 		int eq = 0;
 
-		fprintf(f, "\r\n//");
+//		fprintf(f, "\r\n//");
 
-		for (i = 0; i < 128; i++)fprintf(f, "%d ", v_out[i + frame * 128]);
-		fprintf(f, "\r\n");
+//		for (i = 0; i < 128; i++)fprintf(f, "%d ", v_out[i + frame * 128]);
+//		fprintf(f, "\r\n");
 
 		for (i = 0; i < 128; i++)
 		{
@@ -1868,7 +1879,7 @@ void compress_video(int frames_chunk)
 			{
 				if (eq)
 				{
-					fprintf(f, "\r\n%d,/*skip:%d*/\r\n", eq + 127, eq);
+					fprintf(f, "%d,", eq + 127);
 					eq = 0;
 					b++;
 				}
@@ -1883,7 +1894,7 @@ void compress_video(int frames_chunk)
 			b++;
 		}
 	}
-	fprintf(f, "//bytes:%d\r\n};\r\n", b);
+	fprintf(f, "//b:%d\r\n};\r\n", b);
 
 }
 
@@ -1907,7 +1918,7 @@ int main_encoder(char *fname)
 	//	img_xres = img->GetWidth();
 		//img_yres = img->GetHeight();
 	//	printf("xres (should be 128)  %d yres %d", img_xres, img_yres);
-	
+	printf("main encoding step\r\n");
 	file_charsets = fopen("video_charsets.h", "wb");
 	file_chunks = fopen("video_chunks.h", "wb");
 
@@ -1938,7 +1949,7 @@ int main_encoder(char *fname)
 
 anfang:
 
-	static int ccc = 10;
+	static int ccc = 100;
 	v_out_pos = 0;
 	int x, y, i, c = 4;
 	dump = 0;
@@ -1949,7 +1960,7 @@ anfang:
 	vq_nr = 1;
 	memset(v, 0, sizeof(v));
 	printf("Chunk!\r\n!");
-	ccc = 10;
+	ccc = 100;
 	for (;;)
 	{
 		int frame_end = (frames_chunk + frame_start);
@@ -1978,7 +1989,8 @@ anfang:
 		if (dump)
 		{
 			for (i = 0; i < MAX_TILES; i++)v[i].dump(i, file_charsets, 0);
-			for (i = 0; i < MAX_TILES; i++)v[i].dump(i, file_charsets, 0xf);
+			// temporal dithering:
+//			for (i = 0; i < MAX_TILES; i++)v[i].dump(i, file_charsets, 0xf);
 
 		}
 
@@ -2001,7 +2013,7 @@ anfang:
 			{
 				ccc--;
 				if (ccc > 0)
-					c = 4;  // XXX 25
+					c = 25;
 				unused++;
 				if ((rnd() & 0xf) == 0)worst = rnd() % vq_nr;
 				v[i].clear();
