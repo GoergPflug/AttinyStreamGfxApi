@@ -260,9 +260,11 @@ static inline GfxApiPosition(unsigned char x, unsigned char y)  <---- Helper Fun
 static void GfxApiBeginLines()  <---- Start storage of Line Points
 
 static void GfxApiStoreLinePoint(unsigned char x1, unsigned char y1)  <------ Store a Point of a Line, call this Function 2 times to draw a Line, GfxApiBeginLines must be called before the first call to this function, but only ONCE per Frame
+
 ***Example: Draw a Line from 10,10 to 20,30 
 
 GfxApiStoreLinePoint (10,10);
+
 GfxApiStoreLinePoint (20,30);
 
 ***All Lines must be stored before calling the Triangle API
@@ -275,8 +277,11 @@ static void GfxApiStoreTrianglePoint(unsigned char x1, unsigned char y1)  <---- 
 Draw a Triangle from 10,10 to 0,20 to 30,30, completly filled, depth 20, also see the Filled 3d Example, sorting must be done by the user application, if you want soring see filled 3d example and look for "gnomesort"
 
 GfxApiStoreTrianglePoint(10,10);  // Point A
+
 GfxApiStoreTrianglePoint(0,20);   // Point B
+
 GfxApiStoreTrianglePoint(30,30);  // Point C
+
 GfxApiStoreTrianglePoint(0xff,20); // 0xff is the Pattern to fill the triangle, 20 is a additional byte which can be used for depth sorting.
 
 
