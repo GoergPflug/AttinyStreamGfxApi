@@ -228,21 +228,37 @@ Display Function
 Some of the Defines will change the API of the Display Function, and add aditional Parameters:
 
 static void DISPLAYFUNC (
+
 	GfxApiCompressedLayer * layers, 
+	
 	u8 fade, 
+	
 	GfxApiSprite * Sprites, 
+	
 	u8 * screen
+
 #ifdef ENABLE_SECOND_CONSOLE
+
 	,u8 * screen2, 
+	
 	s16 zoomX,
+	
 	s16 zoomY,
+	
 	s16 scrollX,
+	
 	s16 scrollY
+
 #endif
+
 #ifdef ENABLE_SECOND_CONSOLE_AFFINE
+
 	,s16 zoomX2,
+	
 	s16 zoomY2
+
 #endif
+)
 
 GFX-API Functions
 ============
