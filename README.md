@@ -247,6 +247,14 @@ static void DISPLAYFUNC (
 GFX-API Functions
 ============
 
+Most of the Functionallity is used by defining Datastructures, Arrays of Char for Consoles, and Structs for Layers and Sprites, but there are also some API Functions:
+
+u8 ApiCharToFontIndex(u8 c);  <----- convert a ascci Char to a Font index, use this to write Text into the Console Arrays
+
+extern void GfxApiWriteToConsole(const char *txt, u8 *screen, u8 x, u8 y)  <----- write a string to a console Array
+
+GfxApiLayerGetNextByte (GfxApiCompressedLayer *g)  <---- decompress Layer data, this function is normally called by the displayfunction and not by the user application, every time it is called it will extract one pixel from the layer.it can be used to build custom layer functionallity by calling it in the Pixel Callback, see wobble for an example
+
 static inline GfxApiPosition(unsigned char x, unsigned char y)  <---- Helper Function to Calculate a Position on the Screen from X,Y Coordinate, usefull for placing Sprites and Layers
 
 static void GfxApiBeginLines()  <---- Start storage of Line Points
@@ -264,7 +272,7 @@ static void GfxApiBeginTriangles() <---- Start storage of Triangle Coordinates a
 static void GfxApiStoreTrianglePoint(unsigned char x1, unsigned char y1)  <---- Store A Triangle Point
 ***Example:
 
-Draw a Triangle from 10,10 to 0,20 to 30,30, completly filled, depth 20, also see the Filled 3d Example
+Draw a Triangle from 10,10 to 0,20 to 30,30, completly filled, depth 20, also see the Filled 3d Example, sorting must be done by the user application, if you want soring see filled 3d example and look for "gnomesort"
 
 GfxApiStoreTrianglePoint(10,10);  // Point A
 GfxApiStoreTrianglePoint(0,20);   // Point B
