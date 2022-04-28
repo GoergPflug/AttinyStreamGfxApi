@@ -40,10 +40,10 @@ unsigned char calc_alien_bg(unsigned char x,unsigned char y);
 ////////
 #define ENABLE_FONT_BASIC
 #define ENABLE_ARDUINO_SUPPORT
-#include "/dev/tiny_multi_os.h"
+#include "/AttinyStreamGfxApi-main/tiny_multi_os.h"
 ///////////////////////////////////////////////////////////////////////////////
 //Gfx-Api Build Render Function from Defines
-#include "/dev/displayfunc.h"
+#include "/AttinyStreamGfxApi-main/displayfunc.h"
 /////////////////////////////////////////////////////////////////////
 
 const  char s[] __attribute__((progmem)) ="                the quick brown fox jumps over the lazy dog                ";
@@ -57,6 +57,7 @@ void loop()
 {
   static unsigned char console[16*8];
   static unsigned char console2[SECOND_CONSOLE_LINE_LENGTH*8];
+  memset(console2,ApiCharToFontIndex(' '),sizeof(console2));
   SystemServer_WriteToScreen("we come in peace",console,0,0);
   int scrollX=0;
   int scrollY=0;
