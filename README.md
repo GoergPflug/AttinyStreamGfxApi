@@ -204,12 +204,18 @@ Defines to configure the Library:
 #define ENABLE_SECOND_CONSOLE		// enables the second console (see zoom and scroll example), the second console has additional features, it can be zoomed and scrolled, it is slower than the first one
 
 #define CONSOLE_LINE_START 0 // define starting row of the console on screen, 0-7, 0 results in the console starting at x,y=0,0, 1 results in x,y=0,8 
+
 #define CONSOLE_LINE_END 7 // define the last row of the console on screen 0 is y=0, 1 is y=8 ...
 
 #define SECOND_CONSOLE_LINE_START 0 // define starting row of the console on screen, 0-7, 0 results in the console starting at x,y=0,0, 1 results in x,y=0,8 
+
 #define SECOND_CONSOLE_LINE_END 7 // define the last row of the console on screen 0 is y=0, 1 is y=8 ...
+
 #define ENABLE_SECOND_CONSOLE_AFFINE  // Enable affine transformations on the second console, this can be used to rotate or shear the console, see console rotation example for usage
-#define ENABLE_USERFONT 1   // add aditonal chars to the font, the library will include "userfont.h", this file contains the bitmaps of the new chars, binary in rows.
+
+#define ENABLE_USERFONT // add aditonal chars to the font, the library will include "userfont.h", this file contains the bitmaps of the new chars, binary in rows.
+
+#define REPLACE_FONT "myfontinclude.h" // completly replace the built in Font with something else, can be used to implement a VQ-Video Codec. 
 
 #define ENABLE_DARKER_SCREEN // alternative Initalization to make the Display less bright
 
