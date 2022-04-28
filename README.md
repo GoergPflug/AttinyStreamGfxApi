@@ -79,7 +79,7 @@ Version History:
 0.8.2		Support Video Codec, Support font replacement for Vector Quantization, demo: https://www.youtube.com/shorts/qawMsh1IuQk
 		and https://www.youtube.com/shorts/jIQZTjM_cL8
 		
-0.8.3		Support Chunked video encoding -> Videos >32KB for Arduino, support reading .AVI and .MP4 instead of large png. Added Conversion of the "Bad Apple Demo", working on Arduinos with 256kb Flash. see https://www.youtube.com/watch?v=pep0TOAl7SM 
+0.8.3		Support Chunked video encoding -> Videos >32KB for Arduino, support reading .AVI and .MP4 instead of large png. Added Conversion of the "Bad Apple Demo", working on Arduinos with 256kb Flash. see https://www.youtube.com/watch?v=pep0TOAl7SM Bad Apple Demo in Wokwi Emulator: https://wokwi.com/projects/329831079332545106
 
 Description of the Demos
 ========================
