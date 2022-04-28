@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "author": "Görg Pflug",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-mega", "id": "mega", "top": 20.66, "left": -179.36, "attrs": {} },
+    { "type": "wokwi-ssd1306", "id": "oled1", "top": 228.33, "left": -188.63, "attrs": {} }
+  ],
+  "connections": [
+    [ "oled1:VIN", "mega:5V", "red", [ "v0" ] ],
+    [ "oled1:GND", "mega:GND.2", "black", [ "v0" ] ],
+    [ "mega:21", "oled1:CLK", "green", [ "v-194.63", "h-361.6", "v17.84" ] ],
+    [ "mega:20", "oled1:DATA", "green", [ "v-178.67", "h-369", "v3.76" ] ]
+  ]
+}
