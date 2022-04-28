@@ -35,7 +35,7 @@ when using custom i2c change (in tiny_multi_os.h)
 to
 #define SSD1306_ADDRESS 0x7A
 
-
+Note: SH1106 is not supported, the library depends on the vertical display mode of the SSD1306
 
 Version History:
 
