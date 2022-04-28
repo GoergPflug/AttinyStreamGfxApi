@@ -20,7 +20,8 @@ and
 https://www.youtube.com/channel/UC5VMDSmyEacCnnA2sUn5uhw/videos
 
 
-*****************If the Display does not work:
+If the Display does not work:
+=============================
 when using arduino try:
 
 change
@@ -38,7 +39,7 @@ to
 Note: SH1106 is not supported, the library depends on the vertical display mode of the SSD1306
 
 Version History:
-
+================
 
 
 0.2		Multiple Consoles second Console with Zoom and Softscroll
@@ -80,7 +81,7 @@ Version History:
 0.8.3		Support Chunked video encoding -> Videos >32KB for Arduino, support reading .AVI and .MP4 instead of large png.
 
 Description of the Demos
-
+========================
 
 #1 Diagram
 
@@ -161,7 +162,8 @@ The "3D Engine" shows a rotating cube. Primarily the drawing of lines is demonst
 "Raycaster" is a port of a simple raycasting engine for the PC. An engine of this type was also used in the original "Wolfenstein 3D".
 
 
-************** Defines to configure the Library:
+Defines to configure the Library:
+=================================
 
 #define ENABLE_LOW_QUALITY_HALFTONE   // turn on low quality halftoning, saves 64 bytes of ram, looks different, not allways worse
 
@@ -201,6 +203,11 @@ The "3D Engine" shows a rotating cube. Primarily the drawing of lines is demonst
 #define SECOND_CONSOLE_LINE_END 7 // define the last row of the console on screen 0 is y=0, 1 is y=8 ...
 
 #define ENABLE_USERFONT 1   // add aditonal chars to the font, the library will include "userfont.h", this file contains the bitmaps of the new chars, binary in rows.
+
+#define ENABLE_DARKER_SCREEN // alternative Initalization to make the Display less bright
+
+#ifdef ENABLE_FONT_BASIC // Support full ASCII Charset on Console
+
 
 
 
