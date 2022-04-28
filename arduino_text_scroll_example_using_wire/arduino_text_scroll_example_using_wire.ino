@@ -40,10 +40,10 @@ unsigned char calc_alien_bg(unsigned char x,unsigned char y);
 ////////
 #define ENABLE_FONT_BASIC
 #define ENABLE_ARDUINO_SUPPORT
-#include "/AttinyStreamGfxApi-main/tiny_multi_os.h"
+#include "/dev/tiny_multi_os.h"
 ///////////////////////////////////////////////////////////////////////////////
 //Gfx-Api Build Render Function from Defines
-#include "/AttinyStreamGfxApi-main/displayfunc.h"
+#include "/dev/displayfunc.h"
 /////////////////////////////////////////////////////////////////////
 
 const  char s[] __attribute__((progmem)) ="                the quick brown fox jumps over the lazy dog                ";
