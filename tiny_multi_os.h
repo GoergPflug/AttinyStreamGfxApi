@@ -34,7 +34,7 @@ THIS SOFTWARE IS PROVIDED BY THE Görg Pflug, CPKI Gmbh AND CONTRIBUTORS “AS I
 #define PIN_SCL 2
 
 // helper function, Calculate Skip Counter from x,y coord
-static inline GfxApiPosition(unsigned char x, unsigned char y)
+static inline int GfxApiPosition(unsigned char x, unsigned char y)
 {
 	return x*64+y;
 }
