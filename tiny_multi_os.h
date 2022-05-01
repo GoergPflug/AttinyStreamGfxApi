@@ -488,6 +488,22 @@ void os_init_ssd1306 (void)
 	os_i2c_write(init1306, sizeof(init1306));
 }
 
+// set the brightness of the screen 0 to 15
+void GfxApiSetBrightness (u8 brightness)
+{
+	brightness=brightness|(brightness<<4);
+	u8 v1=brightness>>5;
+	v1<<=4;
+	u8 v2=brightness>>4;
+	v2|=v2<<4;
+	const u8 init1306[]={
+		0,
+		0xd9, v2,0xdb,v1,0x81,brightness
+	};
+	os_i2c_write(init1306, sizeof(init1306));
+}
+
+
 #ifndef ENABLE_ARDUINO_SUPPORT
 extern void MainTask();
 int main()
