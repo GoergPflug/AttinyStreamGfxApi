@@ -300,8 +300,8 @@ Draw a Triangle from 10,10 to 0,20 to 30,30, completly filled, depth 20, also se
 
 	GfxApiStoreTrianglePoint(0xff,20); // 0xff is the Pattern to fill the triangle, 20 is a additional byte which can be used for depth sorting.
 
-
-
+void GfxApiSetBrightness (u8 brightness)
+set the brightness of the screen 0 to 15
 
 
 
