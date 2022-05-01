@@ -526,10 +526,10 @@ static void DISPLAYFUNC (
 			
 #ifdef ENABLE_SECOND_CONSOLE
 #ifndef ENABLE_SECOND_CONSOLE_AFFINE
-// vermutlich bug: (y_pos_screen>>8)
 			if((y_pos_screen>=SECOND_CONSOLE_LINE_START)&&((y_pos_screen)<SECOND_CONSOLE_LINE_END))
 			{
 				u8 the_char = (screen2[charpos_second_con +SECOND_CONSOLE_LINE_LENGTH* (((second_console_y>>8)-SECOND_CONSOLE_LINE_START)>>3)]);
+
 
 //				u8 the_char = (screen2[charpos_second_con +SECOND_CONSOLE_LINE_LENGTH* (((second_console_y>>8)-SECOND_CONSOLE_LINE_START)>>3)]);
 				const u8 font_block8=pgm_read_byte(&os_font[((int)the_char << 3) + ( (second_console_x>>8) & 7)]);
@@ -565,11 +565,19 @@ static void DISPLAYFUNC (
 			if(!or_bit)
 			{
 				or_bit=1;
-				#ifdef ENABLE_CONSOLE
+#ifdef ENABLE_CONSOLE
 				if((y_pos_screen>=CONSOLE_LINE_START)&&(y_pos_screen<CONSOLE_LINE_END))
 				{
 					u8 the_char = (screen[charpos +16* ((y_pos_screen-CONSOLE_LINE_START)>>3)]);
-					block_8_px |= pgm_read_byte(&os_font[((int)the_char << 3) + (x_pos_screen & 7)]);
+#ifdef ENABLE_CONSOLE_BIT7_INVERT
+					u8 xor_mask=(the_char&0x80)?255:0;
+					the_char&=0x7f;
+#endif								
+					block_8_px |= pgm_read_byte(&os_font[((int)the_char << 3) + (x_pos_screen & 7)])
+#ifdef ENABLE_CONSOLE_BIT7_INVERT
+					^xor_mask
+#endif								
+					;
 				}
 				
 #endif
