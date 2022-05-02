@@ -503,6 +503,31 @@ void GfxApiSetBrightness (u8 brightness)
 	os_i2c_write(init1306, sizeof(init1306));
 }
 
+void GfxApiSetDisplayEnable (u8 e)
+{
+	const u8 init1306[]={
+		0,
+		0x0ae +(e?1:0)
+	};
+	os_i2c_write(init1306, sizeof(init1306));
+}
+void GfxApiFlipY(u8 flip_y)
+{
+	const u8 init1306[]={
+		0,
+		flip_y?	0xc0:0xc8
+	};
+	os_i2c_write(init1306, sizeof(init1306));
+}
+void GfxApiSetInvert (u8 invert)
+{
+	const u8 init1306[]={
+		0,
+		0xa6+invert
+	};
+	os_i2c_write(init1306, sizeof(init1306));
+}
+
 
 #ifndef ENABLE_ARDUINO_SUPPORT
 extern void MainTask();
