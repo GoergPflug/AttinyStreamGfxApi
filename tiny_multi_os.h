@@ -523,7 +523,7 @@ void GfxApiSetInvert (u8 invert)
 {
 	const u8 init1306[]={
 		0,
-		0xa6+invert
+		0xa6+(invert?1:0)
 	};
 	os_i2c_write(init1306, sizeof(init1306));
 }
