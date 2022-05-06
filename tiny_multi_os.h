@@ -45,10 +45,18 @@ u8 _gfx_linepos= 0;
 #ifdef ENABLE_TRIANGLES
 u8 _gfx_tripos=0;
 #endif
+#ifdef ENABLE_CIRCLES
+u8 _gfx_circlepos=0;
+#endif
+
+
 #ifndef NR_TRIS
 #define NR_TRIS 0
 #endif
-static unsigned char _gfx_points_of_lines[4 * NR_LINES+ 8 * NR_TRIS];
+#ifndef NR_CIRCLES
+#define NR_CIRCLES 0
+#endif
+static unsigned char _gfx_points_of_lines[4 * NR_LINES+ 8 * NR_TRIS+4*NR_CIRCLES];
 
 
 // Start storage of Line Points
@@ -60,6 +68,12 @@ static void GfxApiBeginLines()
 static void GfxApiBeginTriangles()
 {
 	_gfx_tripos=0;
+}
+#endif
+#ifdef ENABLE_CIRCLES
+static void GfxApiBeginCircles()
+{
+	_gfx_circlepos=0;
 }
 #endif
 
@@ -83,6 +97,25 @@ static void GfxApiStoreLinePoint(unsigned char x1, unsigned char y1)
 	_gfx_points_of_lines[_gfx_linepos+1] = y1;
 	_gfx_linepos += 2;
 }
+
+#ifdef ENABLE_CIRCLES
+static void GfxApiStoreCircle(unsigned char x1, unsigned char y1,unsigned char radius,unsigned char pattern)
+{
+#ifndef ENABLE_TRIANGLES
+#define _gfx_tripos 0
+#endif
+	_gfx_points_of_lines[_gfx_circlepos+_gfx_linepos+_gfx_tripos] = x1;
+	_gfx_points_of_lines[_gfx_circlepos+1+_gfx_linepos+_gfx_tripos] = y1;
+	_gfx_points_of_lines[_gfx_circlepos+2+_gfx_linepos+_gfx_tripos] = radius;
+	_gfx_points_of_lines[_gfx_circlepos+3+_gfx_linepos+_gfx_tripos] = pattern;
+	_gfx_circlepos += 4;
+
+#ifndef ENABLE_TRIANGLES
+#undef _gfx_tripos
+#endif
+}
+#endif
+
 #ifdef ENABLE_TRIANGLES
 static void GfxApiStoreTrianglePoint(unsigned char x1, unsigned char y1)
 {
