@@ -474,7 +474,7 @@ static void DISPLAYFUNC (
 #ifndef ENABLE_TRIANGLES
 #define _gfx_tripos 0
 #endif
-		   for(u8 i=_gfx_linepos;i<_gfx_linepos+_gfx_circlepos;i+=4)
+		   for(u8 i=_gfx_linepos;i<_gfx_linepos+_gfx_circlepos+_gfx_tripos;i+=4)
 		   fillCircle(_gfx_points_of_lines[i], _gfx_points_of_lines[i+1], _gfx_points_of_lines[i+2], _gfx_points_of_lines[i+3],linebuffer);
 #ifndef ENABLE_TRIANGLES
 #undef _gfx_tripos
