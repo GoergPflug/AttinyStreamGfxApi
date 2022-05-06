@@ -96,6 +96,7 @@ static inline void _line(u8 x0, u8 y0, u8 x1, u8 y1,unsigned char *linebuffer) {
 
 static inline void _hline(u8 x0, u8 y0, u8 x1, u8 y1,u8 c, u8 *linebuffer) {
 	y0-=96;
+	if(x0>x1)swapu8(x0,x1);
 	if(y0&(~63))return;//y-clipping
 	if((x0&0xf8)>_cur_seg+7) return ; // links grösser als cur seg... raus...
 	if((x1&0xf8)<_cur_seg) return ; // rechts ist kleiner als das akute segment....raus...die linie
@@ -110,7 +111,7 @@ static inline void _hline(u8 x0, u8 y0, u8 x1, u8 y1,u8 c, u8 *linebuffer) {
 	x0-=_cur_seg;
 	x1-=_cur_seg;
 	u8 a=1<<x0;
-static const u8 hl[8] PROGMEM ={1,1+2,1+2+4,1+2+4+8,1+2+4+16,1+2+4+8+16+32,1+2+4+8+16+32+64,1+2+4+8+16+32+64+128}
+static const u8 hl[8] PROGMEM ={1,1+2,1+2+4,1+2+4+8,1+2+4+8+16,1+2+4+8+16+32,1+2+4+8+16+32+64,1+2+4+8+16+32+64+128}
 ;	
 	u8 l=pgm_read_byte(&hl[x1-x0])<<x0;
 	u8 mask=~l;
@@ -118,6 +119,57 @@ static const u8 hl[8] PROGMEM ={1,1+2,1+2+4,1+2+4+8,1+2+4+16,1+2+4+8+16+32,1+2+4
 	linebuffer[y0]=(linebuffer[y0]&mask)|c;
 	//for(;x0!=x1+1;x0++)linebuffer[y0]^=1<<x0;
 }
+
+#ifdef ENABLE_CIRCLES
+void drawCircle(int xc, int yc, int x, int y,u8 *linebuffer,u8 pat,u8 fill)
+{
+	if(!fill)
+	{
+		_setpixel(xc+x, yc+y, linebuffer);
+		_setpixel(xc-x, yc+y, linebuffer);
+		
+		_setpixel(xc+x, yc-y, linebuffer);
+		_setpixel(xc-x, yc-y, linebuffer);
+		
+		_setpixel(xc+y, yc+x, linebuffer);
+		_setpixel(xc-y, yc+x, linebuffer);
+		_setpixel(xc+y, yc-x, linebuffer);
+		_setpixel(xc-y, yc-x, linebuffer);
+	}
+	else
+	{
+		_hline(xc-x,yc+y,xc+x,0,pat,linebuffer);
+		_hline(xc-x,yc-y,xc+x,0,pat,linebuffer);
+		_hline(xc+y,yc+x,xc-y,0,pat,linebuffer);
+		_hline(xc+y,yc-x,xc-y,0,pat,linebuffer);
+	
+	}
+}
+void fillCircle(u8 xc,u8 yc,u8 r,u8 pat,u8*linebuffer)
+{
+	if(((xc-r)&0xf8)>_cur_seg+7) return ; // links grösser als cur seg... raus...
+	if(((xc+r)&0xf8)<_cur_seg) return ; // rechts ist kleiner als das akute segment....raus...die linie
+// kann das segment nicht schneiden
+	_need_clear=1;
+	u8 fill=1;
+	//if(yc<128)yc+=64;else fill=1,yc-=64;
+	int x = 0, y = r;
+	int  d = 3 - 2 * r;
+	drawCircle(xc, yc, x, y,linebuffer,pat,fill);
+	while (y >= x)
+	{
+		x++;
+		if (d > 0)
+		{
+			y--;
+			d = d + 4 * (x - y) + 10;
+		}
+		else
+		d = d + 4 * x + 6;
+		drawCircle(xc, yc, x, y,linebuffer,pat,fill);
+	}
+}
+#endif
 
 #ifdef ENABLE_TRIANGLES
 // triangle code was once based on https://www.avrfreaks.net/sites/default/files/triangles.c , https://www.avrfreaks.net/forum/algorithm-draw-filled-triangle
@@ -434,6 +486,17 @@ static void DISPLAYFUNC (
 		   for(u8 i=_gfx_linepos;i<_gfx_linepos+_gfx_tripos;i+=8)
 	 		   fillTriangle(_gfx_points_of_lines[i], _gfx_points_of_lines[i+1], _gfx_points_of_lines[i+2], _gfx_points_of_lines[i+3],_gfx_points_of_lines[i+4], _gfx_points_of_lines[i+5],_gfx_points_of_lines[i+6],linebuffer);
 #endif		 	   
+#ifdef ENABLE_CIRCLES
+
+#ifndef ENABLE_TRIANGLES
+#define _gfx_tripos 0
+#endif
+		   for(u8 i=_gfx_linepos;i<_gfx_linepos+_gfx_circlepos;i+=4)
+		   fillCircle(_gfx_points_of_lines[i], _gfx_points_of_lines[i+1], _gfx_points_of_lines[i+2], _gfx_points_of_lines[i+3],linebuffer);
+#ifndef ENABLE_TRIANGLES
+#undef _gfx_tripos
+#endif
+#endif
 	   }
 #endif
 #ifdef ENABLE_CONSOLE
