@@ -121,29 +121,14 @@ static const u8 hl[8] PROGMEM ={1,1+2,1+2+4,1+2+4+8,1+2+4+8+16,1+2+4+8+16+32,1+2
 }
 
 #ifdef ENABLE_CIRCLES
-void drawCircle(int xc, int yc, int x, int y,u8 *linebuffer,u8 pat,u8 fill)
+void drawCircle(int xc, int yc, int x, int y,u8 *linebuffer,u8 pat)
 {
-	if(!fill)
-	{
-		_setpixel(xc+x, yc+y, linebuffer);
-		_setpixel(xc-x, yc+y, linebuffer);
-		
-		_setpixel(xc+x, yc-y, linebuffer);
-		_setpixel(xc-x, yc-y, linebuffer);
-		
-		_setpixel(xc+y, yc+x, linebuffer);
-		_setpixel(xc-y, yc+x, linebuffer);
-		_setpixel(xc+y, yc-x, linebuffer);
-		_setpixel(xc-y, yc-x, linebuffer);
-	}
-	else
-	{
+	
 		_hline(xc-x,yc+y,xc+x,0,pat,linebuffer);
 		_hline(xc-x,yc-y,xc+x,0,pat,linebuffer);
 		_hline(xc+y,yc+x,xc-y,0,pat,linebuffer);
 		_hline(xc+y,yc-x,xc-y,0,pat,linebuffer);
 	
-	}
 }
 void fillCircle(u8 xc,u8 yc,u8 r,u8 pat,u8*linebuffer)
 {
@@ -151,11 +136,9 @@ void fillCircle(u8 xc,u8 yc,u8 r,u8 pat,u8*linebuffer)
 	if(((xc+r)&0xf8)<_cur_seg) return ; // rechts ist kleiner als das akute segment....raus...die linie
 // kann das segment nicht schneiden
 	_need_clear=1;
-	u8 fill=1;
-	//if(yc<128)yc+=64;else fill=1,yc-=64;
 	int x = 0, y = r;
 	int  d = 3 - 2 * r;
-	drawCircle(xc, yc, x, y,linebuffer,pat,fill);
+	drawCircle(xc, yc, x, y,linebuffer,pat);
 	while (y >= x)
 	{
 		x++;
@@ -166,7 +149,7 @@ void fillCircle(u8 xc,u8 yc,u8 r,u8 pat,u8*linebuffer)
 		}
 		else
 		d = d + 4 * x + 6;
-		drawCircle(xc, yc, x, y,linebuffer,pat,fill);
+		drawCircle(xc, yc, x, y,linebuffer,pat);
 	}
 }
 #endif
