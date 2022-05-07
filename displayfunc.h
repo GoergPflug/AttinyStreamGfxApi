@@ -94,7 +94,7 @@ static inline void _line(u8 x0, u8 y0, u8 x1, u8 y1,unsigned char *linebuffer) {
 }
 
 
-static inline void _hline(u8 x0, u8 y0, u8 x1, u8 y1,u8 c, u8 *linebuffer) {
+static inline void _hline(u8 x0, u8 y0, u8 x1, u8 c, u8 *linebuffer) {
 	y0-=96;
 	if(x0>x1)swapu8(x0,x1);
 	if(y0&(~63))return;//y-clipping
@@ -124,10 +124,10 @@ static const u8 hl[8] PROGMEM ={1,1+2,1+2+4,1+2+4+8,1+2+4+8+16,1+2+4+8+16+32,1+2
 void drawCircle(int xc, int yc, int x, int y,u8 *linebuffer,u8 pat)
 {
 	
-		_hline(xc-x,yc+y,xc+x,0,pat,linebuffer);
-		_hline(xc-x,yc-y,xc+x,0,pat,linebuffer);
-		_hline(xc+y,yc+x,xc-y,0,pat,linebuffer);
-		_hline(xc+y,yc-x,xc-y,0,pat,linebuffer);
+		_hline(xc-x,yc+y,xc+x,pat,linebuffer);
+		_hline(xc-x,yc-y,xc+x,pat,linebuffer);
+		_hline(xc+y,yc+x,xc-y,pat,linebuffer);
+		_hline(xc+y,yc-x,xc-y,pat,linebuffer);
 	
 }
 void fillCircle(u8 xc,u8 yc,u8 r,u8 pat,u8*linebuffer)
@@ -284,7 +284,7 @@ void fillTriangle(u8 x1,u8 y1,u8 x2,u8 y2,u8 x3,u8 y3, u8 c,u8*linebuffer) {
 		if(minx>t2x) minx=t2x;
 		if(maxx<t1x) maxx=t1x; 
 		if(maxx<t2x) maxx=t2x;
-		_hline(minx,y, maxx, y,c,linebuffer);    // Draw line from min to max points found on the y
+		_hline(minx,y, maxx, c,linebuffer);    // Draw line from min to max points found on the y
 		// Now increase y
 		if(!(change&1)) t1x += signx1;
 		t1x+=t1xp;
@@ -374,7 +374,7 @@ void fillTriangle(u8 x1,u8 y1,u8 x2,u8 y2,u8 x3,u8 y3, u8 c,u8*linebuffer) {
 		if(minx>t2x) minx=t2x;
 		if(maxx<t1x) maxx=t1x; 
 		if(maxx<t2x) maxx=t2x;
-		_hline(minx,y, maxx, y,c,linebuffer);    // Draw line from min to max points found on the y
+		_hline(minx,y, maxx, c,linebuffer);    // Draw line from min to max points found on the y
 		// Now increase y
 		if(!(change&1)) t1x += signx1;
 		t1x+=t1xp;
@@ -630,7 +630,7 @@ static void DISPLAYFUNC (
 #endif								
 					block_8_px |=
 #ifndef ENABLE_CONSOLE0_FONT_SWITCHING				
-					 pgm_read_byte(&os_font[((int)the_char << 3) + (x_pos_screen & 7)])
+					pgm_read_byte(&os_font[((int)the_char << 3) + (x_pos_screen & 7)])
 #else
 					pgm_read_byte_far(addr)
 #endif
