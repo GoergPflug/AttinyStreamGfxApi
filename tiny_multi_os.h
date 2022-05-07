@@ -289,8 +289,7 @@ static void os_i2c_write (const u8 *buf, u8 len)
 	os_i2c_stop();
 #else
 	Wire.beginTransmission(WIRE_SCREEN_ADDRESS);
-	while (len--)
-		Wire.write(*buf++);
+	Wire.write(buf,len);
 	Wire.endTransmission();
 #endif
 }
