@@ -393,6 +393,9 @@ static void DISPLAYFUNC (
 	u8 fade, 
 	GfxApiSprite * Sprites, 
 	u8 * screen
+#ifdef ENABLE_CONSOLE0_FONT_SWITCHING
+,long long font_adress_console_0
+#endif
 #ifdef ENABLE_SECOND_CONSOLE
 	,u8 * screen2, 
 	s16 zoomX,
@@ -615,11 +618,22 @@ static void DISPLAYFUNC (
 				if((y_pos_screen>=CONSOLE_LINE_START)&&(y_pos_screen<CONSOLE_LINE_END))
 				{
 					u8 the_char = (screen[charpos +16* ((y_pos_screen-CONSOLE_LINE_START)>>3)]);
+#ifdef ENABLE_CONSOLE0_FONT_SWITCHING
+				long long addr=pgm_get_far_address(os_font);
+				addr+=((long long)the_char << 3) + (x_pos_screen & 7);
+				addr+=font_adress_console_0;
+#endif
+
 #ifdef ENABLE_CONSOLE_BIT7_INVERT
 					u8 xor_mask=(the_char&0x80)?255:0;
 					the_char&=0x7f;
 #endif								
-					block_8_px |= pgm_read_byte(&os_font[((int)the_char << 3) + (x_pos_screen & 7)])
+					block_8_px |=
+#ifndef ENABLE_CONSOLE0_FONT_SWITCHING				
+					 pgm_read_byte(&os_font[((int)the_char << 3) + (x_pos_screen & 7)])
+#else
+					pgm_read_byte_far(addr)
+#endif
 #ifdef ENABLE_CONSOLE_BIT7_INVERT
 					^xor_mask
 #endif								
