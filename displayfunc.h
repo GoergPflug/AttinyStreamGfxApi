@@ -409,6 +409,13 @@ static void DISPLAYFUNC (
 #endif
 	)
 {
+#ifdef ENABLE_ATTINY_POWER_MANAGER
+	if(low_power_screen_disable)
+	{
+		_manage_battery();
+		return;
+	}
+#endif
 
 #ifdef ENABLE_WIRE
 	u8 wire_cnt=0;
@@ -709,6 +716,10 @@ static void DISPLAYFUNC (
 	}
 #endif	
 	os_i2c_stop();
+#ifdef ENABLE_ATTINY_POWER_MANAGER
+	_manage_battery();		
+#endif
+
 }
 #undef INTERLEAVE
 #ifdef DISABLE_HALFTONE
