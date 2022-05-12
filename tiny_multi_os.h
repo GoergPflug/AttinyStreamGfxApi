@@ -1,4 +1,4 @@
-/* CPKI AttinyGfxApi & TinyMultiOs, Preview Version 0.8.2
+/* CPKI AttinyGfxApi & TinyMultiOs, Preview Version 0.9
 see
 https://www.youtube.com/watch?v=WNJQXsJqSbM
 Copyright (c) 2002
@@ -575,14 +575,12 @@ int main()
 	cli();
 	os_i2c_init();
 	os_init_ssd1306();
-	
 #ifdef ENABLE_ATTINY_POWER_MANAGER
-MCUSR = 0;
-wdt_enable(WDTO_250MS);
-WDTCR |= 1<<WDIE;                     // <-
-set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-sleep_enable();
-sei();
+	MCUSR=0;
+	wdt_enable(WDTO_30MS);
+	WDTCR|=1<<WDIE;             
+	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+	sleep_enable();
 #endif
 	sei();
 	MainTask();
@@ -601,60 +599,48 @@ ISR(WDT_vect)
 	WDTCR |= 1<<WDIE;
 }
 u16 bat_volt=5200;
-u8 pw_counter=0;
 u8 low_power_screen_disable=0;
 #define bit_is_set(sfr, bit) (_SFR_BYTE(sfr) & _BV(bit))
-	static u8 phase=0;
 
 void _manage_battery() {
-	
+	static u8 phase=0;
 	if(phase==0)
 	{
-	ADMUX =
-	(0 << REFS1) | // Sets ref. voltage to VCC, bit 1
-	(0 << REFS0) | // Sets ref. voltage to VCC, bit 0
-	(1 << MUX3)  | // use Vbg as input, MUX bit 3
-	(1 << MUX2)  | // use Vbg as input, MUX bit 2
-	(0 << MUX1)  | // use Vbg as input, MUX bit 1
-	(0 << MUX0);   // use Vbg as input, MUX bit 0
-	ADCSRA =
-	(1 << ADEN)  | // enable ADC
-	(1 << ADPS2) | // set prescaler to 64, bit 2
-	(1 << ADPS1) | // set prescaler to 64, bit 1
-	(0 << ADPS0);  // set prescaler to 64, bit 0
-	phase++;
-	return bat_volt;
+		ADMUX =
+		(0 << REFS1) | // Sets ref. voltage to VCC, bit 1
+		(0 << REFS0) | // Sets ref. voltage to VCC, bit 0
+		(1 << MUX3)  | // use Vbg as input, MUX bit 3
+		(1 << MUX2)  | // use Vbg as input, MUX bit 2
+		(0 << MUX1)  | // use Vbg as input, MUX bit 1
+		(0 << MUX0);   // use Vbg as input, MUX bit 0
+		ADCSRA =
+		(1 << ADEN)  | // enable ADC
+		(1 << ADPS2) | // set prescaler to 64, bit 2
+		(1 << ADPS1) | // set prescaler to 64, bit 1
+		(0 << ADPS0);  // set prescaler to 64, bit 0
+		phase++;
+		return bat_volt;
 	}
 	if(phase==1)
 	{
-		
-	
-	// disable ADC for powersaving
-	ADCSRA &= ~(1<<ADEN);
-
-	// disable analog comperator for powersaving
-	ACSR |= (1<<ACD);
-	// enable the ADC
-	ADCSRA |= (1<<ADEN);
-	phase++;
-	return bat_volt;
+		ADCSRA &= ~(1<<ADEN);
+		ACSR |= (1<<ACD);
+		ADCSRA |= (1<<ADEN);
+		phase++;
+		return bat_volt;
 	}
 	if(phase==2)
 	{
-	ADCSRA |= (1 << ADSC); // start ADC measurement
-	while ( ADCSRA & (1 << ADSC) ); // wait till conversion complete
-
-	//  uint8_t adc_low = ADCL;
-	// uint8_t adc_high = ADCH;
-	uint16_t adc=ADC;
-	// clear the ADIF bit by writing 1 to it
-	ADCSRA|=(1<<ADIF);
-
-	// disable the ADC
-	ADCSRA &= ~(1<<ADEN);
-	phase=3;
-	bat_volt=1000.0f*1024.0f*1.1f/(float)adc;
-	return bat_volt;
+		ADCSRA |= (1 << ADSC); // start ADC measurement
+		while ( ADCSRA & (1 << ADSC) ); // wait till conversion complete
+		uint16_t adc=ADC;
+		// clear the ADIF bit by writing 1 to it
+		ADCSRA|=(1<<ADIF);
+		// disable the ADC
+		ADCSRA &= ~(1<<ADEN);
+		phase=3;
+		bat_volt=1000.0f*1024.0f*1.1f/(float)adc;
+		return bat_volt;
 	}
 	if(bat_volt<2900)
 	{
