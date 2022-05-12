@@ -12,7 +12,13 @@ THIS SOFTWARE IS PROVIDED BY THE Görg Pflug, CPKI Gmbh AND CONTRIBUTORS “AS I
 
 		
 */
-
+#ifndef F_CPU 
+#define F_CPU 16000000
+#warning "CPU Clock: assuming 16mhz"
+#endif
+#include <util/delay.h>
+#include <avr/wdt.h>
+#include <avr/sleep.h>
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdint.h>
@@ -289,7 +295,8 @@ static void os_i2c_write (const u8 *buf, u8 len)
 	os_i2c_stop();
 #else
 	Wire.beginTransmission(WIRE_SCREEN_ADDRESS);
-	Wire.write(buf,len);
+	while (len--)
+		Wire.write(*buf++);
 	Wire.endTransmission();
 #endif
 }
@@ -568,6 +575,16 @@ int main()
 	cli();
 	os_i2c_init();
 	os_init_ssd1306();
+	
+#ifdef ENABLE_ATTINY_POWER_MANAGER
+MCUSR = 0;
+wdt_enable(WDTO_250MS);
+WDTCR |= 1<<WDIE;                     // <-
+set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+sleep_enable();
+sei();
+#endif
+	sei();
 	MainTask();
 }
 #else
@@ -576,4 +593,117 @@ int streamgfx_init_arduino()
 	os_i2c_init();
 	os_init_ssd1306();
 }
+#endif
+
+#ifdef ENABLE_ATTINY_POWER_MANAGER
+ISR(WDT_vect)
+{
+	WDTCR |= 1<<WDIE;
+}
+u16 bat_volt=5200;
+u8 pw_counter=0;
+u8 low_power_screen_disable=0;
+#define bit_is_set(sfr, bit) (_SFR_BYTE(sfr) & _BV(bit))
+	static u8 phase=0;
+
+void _manage_battery() {
+	
+	if(phase==0)
+	{
+	ADMUX =
+	(0 << REFS1) | // Sets ref. voltage to VCC, bit 1
+	(0 << REFS0) | // Sets ref. voltage to VCC, bit 0
+	(1 << MUX3)  | // use Vbg as input, MUX bit 3
+	(1 << MUX2)  | // use Vbg as input, MUX bit 2
+	(0 << MUX1)  | // use Vbg as input, MUX bit 1
+	(0 << MUX0);   // use Vbg as input, MUX bit 0
+	ADCSRA =
+	(1 << ADEN)  | // enable ADC
+	(1 << ADPS2) | // set prescaler to 64, bit 2
+	(1 << ADPS1) | // set prescaler to 64, bit 1
+	(0 << ADPS0);  // set prescaler to 64, bit 0
+	phase++;
+	return bat_volt;
+	}
+	if(phase==1)
+	{
+		
+	
+	// disable ADC for powersaving
+	ADCSRA &= ~(1<<ADEN);
+
+	// disable analog comperator for powersaving
+	ACSR |= (1<<ACD);
+	// enable the ADC
+	ADCSRA |= (1<<ADEN);
+	phase++;
+	return bat_volt;
+	}
+	if(phase==2)
+	{
+	ADCSRA |= (1 << ADSC); // start ADC measurement
+	while ( ADCSRA & (1 << ADSC) ); // wait till conversion complete
+
+	//  uint8_t adc_low = ADCL;
+	// uint8_t adc_high = ADCH;
+	uint16_t adc=ADC;
+	// clear the ADIF bit by writing 1 to it
+	ADCSRA|=(1<<ADIF);
+
+	// disable the ADC
+	ADCSRA &= ~(1<<ADEN);
+	phase=3;
+	bat_volt=1000.0f*1024.0f*1.1f/(float)adc;
+	return bat_volt;
+	}
+	if(bat_volt<2900)
+	{
+		if(!low_power_screen_disable)
+		{
+			const u8 disable_charge_pump[]={
+				0x8d,
+				0x10
+			};
+			os_i2c_write(disable_charge_pump, sizeof(disable_charge_pump));
+			GfxApiSetDisplayEnable(0);
+		}
+		low_power_screen_disable=1;
+	}
+	else
+	{
+		if(bat_volt<POWER_MANAGER_LOW_POWER)
+		{
+			if(!low_power_screen_disable)
+			{
+				u8 br=0;
+#ifdef ENABLE_POWER_MANGER_FADE
+				int nbr=1023-(POWER_MANAGER_LOW_POWER-bat_volt);
+				if(nbr<0)nbr=0;
+				nbr>>=6;
+				br=nbr;
+#endif				
+			
+			GfxApiSetBrightness(br);
+			}
+			sleep_cpu();
+			os_i2c_init();
+
+		}
+		else
+			GfxApiSetBrightness(15);
+			
+		if(low_power_screen_disable)
+		{
+			if(bat_volt>3500)
+			{
+				os_init_ssd1306();
+				low_power_screen_disable=0;
+			}
+		}
+	}
+	phase++;
+	if(phase==60)phase=0;
+}
+
+
 #endif
