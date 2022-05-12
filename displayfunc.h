@@ -29,7 +29,7 @@ Version:
 		
 */
 #ifndef ENABLE_WIRE
-#define INTERLEAVE
+//#define INTERLEAVE
 #endif
 #pragma GCC push_options
 #ifndef DISABLE_OFAST
@@ -491,7 +491,7 @@ static void DISPLAYFUNC (
 #ifdef ENABLE_SECOND_CONSOLE
 #ifndef ENABLE_SECOND_CONSOLE_AFFINE
 		u8 charpos_second_con = (second_console_x>>11);
-		if(charpos_second_con>SECOND_CONSOLE_LINE_LENGTH)charpos_second_con=SECOND_CONSOLE_LINE_LENGTH-1;
+	//	if(charpos_second_con>SECOND_CONSOLE_LINE_LENGTH)charpos_second_con=SECOND_CONSOLE_LINE_LENGTH-1;
 		s16 second_console_y=scrollY;
 #else
 		s16 second_console_y=second_console_y0;
@@ -503,12 +503,6 @@ static void DISPLAYFUNC (
 		u8 block_8_px=0;
 		u8 y_pos_screen;
 		for (y_pos_screen = 0; y_pos_screen < 64; y_pos_screen++
-#ifdef ENABLE_SECOND_CONSOLE
-		,second_console_y+=zoomY
-#ifdef ENABLE_SECOND_CONSOLE_AFFINE
-		,second_console_x_affine+=zoomX2
-#endif
-#endif
 		)
 		{
 #ifdef INTERLEAVE			
@@ -575,24 +569,31 @@ static void DISPLAYFUNC (
 			
 #ifdef ENABLE_SECOND_CONSOLE
 #ifndef ENABLE_SECOND_CONSOLE_AFFINE
-			if((y_pos_screen>=SECOND_CONSOLE_LINE_START)&&((y_pos_screen)<SECOND_CONSOLE_LINE_END))
+	if((y_pos_screen>=SECOND_CONSOLE_LINE_START)&&((y_pos_screen)<SECOND_CONSOLE_LINE_END))
 			{
-				u8 the_char = (screen2[charpos_second_con +SECOND_CONSOLE_LINE_LENGTH* (((second_console_y>>8)-SECOND_CONSOLE_LINE_START)>>3)]);
+				u8 the_char = (screen2[charpos_second_con +SECOND_CONSOLE_LINE_LENGTH* (((second_console_y>>8))>>3)]);
 
 
 //				u8 the_char = (screen2[charpos_second_con +SECOND_CONSOLE_LINE_LENGTH* (((second_console_y>>8)-SECOND_CONSOLE_LINE_START)>>3)]);
 				const u8 font_block8=pgm_read_byte(&os_font[((int)the_char << 3) + ( (second_console_x>>8) & 7)]);
 				if(font_block8 & (1<<((second_console_y>>8)&7)))
 					block_8_px|=or_bit;
+//				if(y_pos_screen&1)	
+	//				block_8_px|=or_bit;
+					
+				second_console_y+=zoomY;
 			}
 #else
 			if((y_pos_screen>=SECOND_CONSOLE_LINE_START)&&((y_pos_screen)<SECOND_CONSOLE_LINE_END))
 			{
 				u8 charpos_second_con = (second_console_x_affine>>11);
-				u8 the_char = (screen2[charpos_second_con +SECOND_CONSOLE_LINE_LENGTH* (((second_console_y>>8)-SECOND_CONSOLE_LINE_START)>>3)]);
+				if(charpos_second_con>SECOND_CONSOLE_LINE_LENGTH)charpos_second_con=SECOND_CONSOLE_LINE_LENGTH-1;
+				u8 the_char = (screen2[charpos_second_con +(SECOND_CONSOLE_LINE_LENGTH)* (((second_console_y>>8))>>3)]);
 				const u8 font_block8=pgm_read_byte(&os_font[((int)the_char << 3) + ( (second_console_x_affine>>8) & 7)]);
 				if(font_block8 & (1<<((second_console_y>>8)&7)))
-				block_8_px|=or_bit;
+					block_8_px|=or_bit;
+				second_console_y+=zoomY;
+				second_console_x_affine+=zoomX2;
 			}
 #endif
 #endif
