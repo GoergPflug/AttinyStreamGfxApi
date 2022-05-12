@@ -81,8 +81,7 @@ Version History:
 		
 0.8.3		Support Chunked video encoding -> Videos >32KB for Arduino, support reading .AVI and .MP4 instead of large png. Added Conversion of the "Bad Apple Demo", working on Arduinos with 256kb Flash. see https://www.youtube.com/watch?v=pep0TOAl7SM Bad Apple Demo in Wokwi Emulator: https://wokwi.com/projects/329831079332545106
 
-0.9		Support drawing Circles,  demo: https://www.youtube.com/shorts/0RNVlqsG6Ww bugfix removes flicker for filled polygons
-
+0.9		Support drawing Circles,  demo: https://www.youtube.com/shorts/0RNVlqsG6Ww bugfix removes flicker for filled polygon, Power Manager for Attiny reduces frame rate if power drops, fades screen, then disables the Display, reenables display if power back.
 Description of the Demos
 ========================
 
