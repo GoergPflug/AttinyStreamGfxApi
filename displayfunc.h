@@ -1,7 +1,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-/* CPKI AttinyStreamGfxApi & TinyMultiOs, Version 0.8.2
+/* CPKI AttinyStreamGfxApi & TinyMultiOs, Version 0.9
 see
 https://www.youtube.com/watch?v=WNJQXsJqSbM
 Copyright (c) 2002
