@@ -329,9 +329,22 @@ u8 ApiCharToFontIndex(u8 c)
 	return 0;
 	#endif
 }
+
+
+// convert a C-String to Font Indices, can be used to use sprintf directly in the console buffer
+// example:
+// sprintf(myconsole,"hello world");
+// GfxApiConvertStringToFontIdx(myconsole);
+void GfxApiConvertStringToFontIdx(u8 *s)
+{
+	while(*s)
+	{
+		*s=ApiCharToFontIndex(*s);
+		s++;
+	}
+}
 #define SystemServer_WriteToScreen GfxApiWriteToConsole
 // for compatibility until all demos are fixed
-
 extern void GfxApiWriteToConsole(const char *txt, u8 *screen, u8 x, u8 y)
 {
 	int p = x + 16 * y;
@@ -567,17 +580,22 @@ void GfxApiSetInvert (u8 invert)
 	os_i2c_write(init1306, sizeof(init1306));
 }
 
-
 #ifndef ENABLE_ARDUINO_SUPPORT
 extern void MainTask();
 int main()
 {
 	cli();
+	DDRB=0;
+	PORTB=255;  // input + pullup
+	PRR=0b1100;   // disable timer, adc
+	MCUCR|=0x80; // disable brownout
+	ACSR|=0x80;
+	
 	os_i2c_init();
 	os_init_ssd1306();
 #ifdef ENABLE_ATTINY_POWER_MANAGER
 	MCUSR=0;
-	wdt_enable(WDTO_30MS);
+	wdt_enable(WDTO_120MS);
 	WDTCR|=1<<WDIE;             
 	set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 	sleep_enable();
@@ -604,7 +622,13 @@ u8 low_power_screen_disable=0;
 
 void _manage_battery() {
 	static u8 phase=0;
-	if(phase==0)
+	if(phase==1)
+	{
+		PRR&=~1; // enable adc....
+		phase++;
+		return bat_volt;
+	}
+	if(phase==2)
 	{
 		ADMUX =
 		(0 << REFS1) | // Sets ref. voltage to VCC, bit 1
@@ -621,7 +645,7 @@ void _manage_battery() {
 		phase++;
 		return bat_volt;
 	}
-	if(phase==1)
+	if(phase==3)
 	{
 		ADCSRA &= ~(1<<ADEN);
 		ACSR |= (1<<ACD);
@@ -629,7 +653,7 @@ void _manage_battery() {
 		phase++;
 		return bat_volt;
 	}
-	if(phase==2)
+	if(phase==4)
 	{
 		ADCSRA |= (1 << ADSC); // start ADC measurement
 		while ( ADCSRA & (1 << ADSC) ); // wait till conversion complete
@@ -638,22 +662,25 @@ void _manage_battery() {
 		ADCSRA|=(1<<ADIF);
 		// disable the ADC
 		ADCSRA &= ~(1<<ADEN);
-		phase=3;
+		phase++;
 		bat_volt=1000.0f*1024.0f*1.1f/(float)adc;
 		return bat_volt;
 	}
-	if(bat_volt<2900)
+	PRR|=1;
+	if(bat_volt<2800)
 	{
 		if(!low_power_screen_disable)
 		{
+			GfxApiSetDisplayEnable(0);
+
 			const u8 disable_charge_pump[]={
+				0,
 				0x8d,
 				0x10
 			};
 			os_i2c_write(disable_charge_pump, sizeof(disable_charge_pump));
-			GfxApiSetDisplayEnable(0);
 		}
-		low_power_screen_disable=1;
+		low_power_screen_disable=10;
 	}
 	else
 	{
@@ -669,10 +696,10 @@ void _manage_battery() {
 				br=nbr;
 #endif				
 			
-			GfxApiSetBrightness(br);
+			GfxApiSetBrightness(0);
 			}
 			sleep_cpu();
-			os_i2c_init();
+			os_i2c_init();  // bring usi back....
 
 		}
 		else
@@ -680,15 +707,21 @@ void _manage_battery() {
 			
 		if(low_power_screen_disable)
 		{
-			if(bat_volt>3500)
+			
+			if(bat_volt>POWER_MANAGER_LOW_POWER)
 			{
-				os_init_ssd1306();
-				low_power_screen_disable=0;
+				sleep_cpu();
+				low_power_screen_disable--;
+				if(!low_power_screen_disable)
+				{
+					os_i2c_init();					
+					os_init_ssd1306();
+				}
 			}
 		}
 	}
 	phase++;
-	if(phase==60)phase=0;
+	if(phase==10)phase=0;
 }
 
 
