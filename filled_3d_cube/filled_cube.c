@@ -105,8 +105,8 @@ static void rotate(accum x, accum y, accum angle,accum s,accum c, accum *r1, acc
 	*r2 = y * c + x * s;
 }
 static __flash const u8 tri_color[12]={// 0,0,0,0,0,0,
-										0x55,255,0x88,255,0x55,0x88,
-										0x88,0x55,0x55,255,255,0x88,
+50, 63, 40, 63, 50, 40,
+40, 50, 50, 63, 63, 40,
 									 };
 typedef struct triangle
 {
