@@ -1641,25 +1641,20 @@ typedef struct vq
 	}
 	void put(unsigned char *img, int xp, int yp, int xres, int idx)
 	{
-		int		map[8 * 8] = {
-			0,48,12,60, 3,51,15,63,
-		   32,16,44,28,35,19,47,31,
-			8,56, 4,52,11,59, 7,55,
-		   40,24,36,20,43,27,39,23,
-			2,50,14,62, 1,49,13,61,
-		   34,18,46,30,33,17,45,29,
-		   10,58, 6,54, 9,57, 5,53,
-		   42,26,38,22,41,25,37,21 }
+		int		map2[8 * 8] = {
+			50,10,56,0,48,8,58,3,29,34,25,37,30,33,24,38,5,52,13,61,4,54,12,62,42,20,45,21,41,17,47,16,9,57,1,49,7,59,27,51,39,26,35,28,32,36,2,31,18,44,22,40,19,46,23,43,63,6,53,11,60,15,55,14,
+		}
 		;
-		int map2[8 * 8] = {
- 0, 32, 8, 40, 2, 34, 10, 42, /* 8x8 Bayer ordered dithering */
+		int map[8 * 8] = {
+0, 32, 8, 40, 2, 34, 10, 42, /* 8x8 Bayer ordered dithering */
 48, 16, 56, 24, 50, 18, 58, 26, /* pattern. Each input pixel */
 12, 44, 4, 36, 14, 46, 6, 38, /* is scaled to the 0..63 range */
 60, 28, 52, 20, 62, 30, 54, 22, /* before looking in this table */
  3, 35, 11, 43, 1, 33, 9, 41, /* to determine the action. */
 51, 19, 59, 27, 49, 17, 57, 25,
 15, 47, 7, 39, 13, 45, 5, 37,
-63, 31, 55, 23, 61, 29, 53, 21 };
+63, 31, 55, 23, 61, 29, 53, 21
+		};
 		int i = 0;
 		int x, y;
 		double err = 0;
@@ -1707,12 +1702,12 @@ typedef struct vq
 			for (y = 0; y < 8; y++)
 				for (x = 0; x < 8; x++)
 				{
-					int c = a[i];
-					if (c > blue_noise[x + idx_x + 512 * (y + idx_y)])c = 255; else c = 0;
+					int c = a[i]>>2;
+					//if (c > blue_noise[x + idx_x + 512 * (y + idx_y)])c = 255; else c = 0;
 					//				c = a[i]/4;
 								//	c = a[i];
 
-						//			if (c > map2[x+8*y])c = 255; else c = 0;
+					if (c > map2[x+8*y])c = 255; else c = 0;
 									//if (c > (rand() & 0xff))err=255-c,c = 255; else err=c, c = 0;
 					img[(x + xp) * 3 + (y + yp) * xres * 3] = c,// a[i],
 						img[(x + xp) * 3 + (y + yp) * xres * 3 + 1] = c,// a[i],
@@ -1722,23 +1717,38 @@ typedef struct vq
 
 	}
 
-	void dump(int idx, FILE *f, int xorit)
+	void dump(int idx, FILE *f, int use_map2)
 	{
 		int i = 0;
 		int x, y;
 		double err = 0;
 		int r;
-		int idx_x = idx & 0xf;
-		int idx_y = idx >> 4;
-		idx_x ^= xorit;
-		idx_y ^= xorit;
-		idx_x *= 8;
-		idx_y *= 8;
 		err = 0;
 		for (i = 0; i < 64; i++)err += a[i];
 		err /= 64;
 		err = 0;
 		int yy;
+
+		int		map[8 * 8] = {
+
+	36,22,51,63,15,28,40,5,46,9,31,6,37,8,18,62,16,1,41,24,42,58,11,50,39,20,44,60,26,55,45,7,48,64,54,30,13,38,21,29,25,57,17,47,23,32,43,3,14,35,52,2,49,59,10,53,27,56,12,34,4,19,33,61,
+//			60,7,41,16,46,11,50,29,17,47,25,55,27,62,20,44,31,10,64,35,6,38,54,5,56,37,51,14,48,24,12,42,18,3,21,33,1,59,32,63,49,28,58,45,19,40,8,26,13,39,9,30,52,15,57,43,34,53,22,61,4,36,23,2,
+			/*
+
+			62,35,2,42,4,46,34,3,
+12,21,56,22,53,29,16,47,
+51,31,43,11,36,7,58,23,
+41,8,25,61,20,49,33,1,
+19,55,38,0,45,9,27,60,
+44,5,28,52,17,57,37,13,
+18,59,32,10,40,30,6,50,
+39,14,48,24,63,15,54,26,
+*/
+		}
+		;
+		int map2[8 * 8] = {
+	19,48,2,50,20,40,22,53,36,5,35,12,62,9,58,26,60,28,59,39,18,45,32,7,13,52,31,3,51,30,1,43,49,21,25,55,14,24,42,17,4,56,46,6,38,63,8,33,27,37,11,57,16,34,29,61,44,10,41,23,47,0,54,15,
+		};
 
 
 		if (1)
@@ -1748,7 +1758,14 @@ typedef struct vq
 				for (y = 0; y < 8; y++)
 				{
 					int c = a[x + y * 8];
-					if (c > blue_noise[x + idx_x + 512 * (y + idx_y)])c = 255; else c = 0;
+					if (!use_map2)
+					{
+						if ((c/3.8) > map[x + y * 8])c = 255; else c = 0;
+					}
+					else
+					{
+						if ((c/3.8) >( map2[x + y * 8]))c = 255; else c = 0;
+					}
 					//				c = a[i]/4;
 								//	c = a[i];
 
@@ -1934,7 +1951,7 @@ int main_encoder(char *fname)
 
 	d_out = (unsigned char *)malloc(img_xres*img_yres * 3);
 
-
+/*
 	FILE*	f = fopen("/dev/blue_noise512x512.raw", "rb");
 	if (!f)
 	{
@@ -1942,7 +1959,7 @@ int main_encoder(char *fname)
 		exit(0);
 	}
 	fread(blue_noise, 512, 512, f);
-
+	*/
 	//	FILE *f1=0,*f2=0;
 	int frames = frames_stored;
 	//int chunk = 0;
@@ -1988,7 +2005,12 @@ anfang:
 
 		if (dump)
 		{
+			fprintf(file_charsets, "\r\n// charset A:\r\n");
 			for (i = 0; i < MAX_TILES; i++)v[i].dump(i, file_charsets, 0);
+			/*
+			fprintf(file_charsets, "\r\n// charset B:\r\n");
+			for (i = 0; i < MAX_TILES; i++)v[i].dump(i, file_charsets, 1);
+			*/
 			// temporal dithering:
 //			for (i = 0; i < MAX_TILES; i++)v[i].dump(i, file_charsets, 0xf);
 
