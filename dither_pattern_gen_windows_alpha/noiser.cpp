@@ -1,5 +1,6 @@
 // noiser.cpp : Diese Datei enthält die Funktion "main". Hier beginnt und endet die Ausführung des Programms.
 //
+float tan_div = 0;
 #undef UNICODE
 #undef _UNICODE
 #define _CRT_SECURE_NO_WARNINGS
@@ -11,7 +12,17 @@
 #include <atlimage.h>
 
 #include <Gdiplusimaging.h>
-unsigned char pattern[64];/* = {
+unsigned char pattern[64]={ 1,  49, 13, 61, 4,  52, 16, 64,
+					33, 17, 45, 29, 36, 20, 48, 32,
+					9,  57, 5,  53, 12, 60, 8,  56,
+					41, 25, 37, 21, 44, 28, 40, 24,
+					3,  51, 15, 63, 2,  50, 14, 62,
+					35, 19, 47, 31, 34, 18, 46, 30,
+					11, 59, 7,  55, 10, 58, 6,  54,
+					43, 27, 39, 23, 42, 26, 38, 22 };
+
+
+;/* = {
 	111,49,142,162,113,195,71,177,201,50,151,94,66,37,85,252,25,99,239,222,
 32,250,148,19,38,106,220,170,194,138,13,167,125,178,79,15,65,173,123,87,
 213,131,247,23,116,54,229,212,41,202,152,132,189,104,53,236,161,62,1,181,
@@ -54,10 +65,10 @@ double eval()
 				for (yy = -8; yy < 9; yy++)
 				{
 					int b = pattern_candidate[((x+xx)&AND)+(AND+1)*((yy+y)&AND)];
-					double aa = abs(a - b);// *(a - b);
+					double aa =atan( abs(a - b)/tan_div);// *(a - b);
 					double dist =(xx*xx + yy * yy);
-					if(dist<8*8)
-					if(dist>0)score += aa/(dist);
+					if (dist < 8 * 8)
+						if (dist > 0)score += aa / dist;// (dist  * sqrt(dist));
 				}
 		}
 	return score;
@@ -79,7 +90,7 @@ display_img(unsigned char *img, int xr, int yr)
 	info.bmiHeader.biSizeImage = 0;
 	info.bmiHeader.biCompression = BI_RGB;
 
-	StretchDIBits(dc, 512, 0, xr*2, yr*2, 0, 0, xr, yr, img, &info, DIB_RGB_COLORS, SRCCOPY);
+	StretchDIBits(dc, 0, 0, xr, yr, 0, 0, xr, yr, img, &info, DIB_RGB_COLORS, SRCCOPY);
 	ReleaseDC(GetConsoleWindow(), dc);
 
 }
@@ -128,7 +139,7 @@ void dither()
 			int px = x & AND;
 			int py = y & AND;
 			int o = 0;
-			if (gray > pattern[px + (AND+1) * py])o = 255;
+			if (gray >= pattern[px + (AND+1) * py])o = 255;
 			data[p * 3] = o;
 			data[p * 3+1] = o;
 			data[p * 3+2] = o;
@@ -151,7 +162,7 @@ void dither_img()
 			int px = x & AND;
 			int py = y & AND;
 			int o = 0;
-			if (gray > pattern[px + (AND + 1) * py])o = 255;
+			if (gray >= pattern[px + (AND + 1) * py])o = 255;
 			data[p * 3] = o;
 			data[p * 3 + 1] = o;
 			data[p * 3 + 2] = o;
@@ -166,8 +177,10 @@ DEFINE_GUID(ImageFormatPNG, 0xb96b3caf, 0x0728, 0x11d3, 0x9d, 0x7b, 0x00, 0x00, 
 
 int main()
 {
+
+	tan_div = 1.0 + 6;// (rnd() % 10);
 	img = new CImage;
-	img->Load("c:/dev/lenna_o.png");
+	img->Load("c:/dev/lenna3.png");
 	conv();
 	int i;
 	if (1)	for (i = 0; i < sizeof(pattern); i++)
@@ -179,18 +192,26 @@ int main()
 		*/
 	}
 
-	
 
-if(1)	for (i = 0; i < sizeof(pattern); i++)
+	dither();
+//	getchar();
+	int nr = rnd() & 63;
+	nr+=5;
+	nr = 5;
+
+if(1)	for (int k = 0; k <63; k++)
 	{
 
-
+	
+	int i = rnd() & (sizeof(pattern) - 1);
 
 		int j = rnd() & (sizeof(pattern)-1);
 		int a = pattern[i];
 		int b = pattern[j];
 		pattern[j] = a;
 		pattern[i] = b;
+	//*/
+	//pattern[k] = k;
 	}
 dither();
 //getchar();
@@ -312,7 +333,8 @@ dither();
 		{
 			int id = rnd();
 			char tmp[30];
-			sprintf(tmp, "pat_%d.h", id);
+
+			sprintf(tmp, "pat %F_%d_tandiv_%d.h", best_score, id,(int)tan_div);
 			FILE* f = fopen(tmp, "wb");
 
 			for (i = 0; i < sizeof(pattern); i++)
@@ -322,7 +344,7 @@ dither();
 			}
 			fclose(f);
 			dither_img();
-			sprintf(tmp, "pat_%d.png", id);
+			sprintf(tmp, "pat %F_%d_tandiv_%d.png",best_score, id,(int)tan_div);
 
 			img->Save(tmp, ImageFormatPNG);
 
