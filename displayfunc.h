@@ -1,10 +1,10 @@
 #include <math.h>
 #include <stdlib.h>
 //#define ENABLE_TRIANGLES
-/* CPKI AttinyStreamGfxApi & TinyMultiOs, Version 0.9.2
+/* CPKI AttinyStreamGfxApi & TinyMultiOs, Version 0.8.2
 see
 https://www.youtube.com/watch?v=WNJQXsJqSbM
-Copyright (c) 2022
+Copyright (c) 2002
 Görg Pflug & CPKI Gmbh, www.cpki.de . All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
@@ -143,7 +143,7 @@ static const u8 hl[8] PROGMEM ={1,1+2,1+2+4,1+2+4+8,1+2+4+8+16,1+2+4+8+16+32,1+2
 	u8 y_add=(y0&7)*8;
 	u16 addr=(u16)&_ordered_dither_matrix_simulated_annealing[(x0&7)+y_add];
 	u8 bit=1<<x0;
-	for(;x0!=x1+1;x0++,addr++,bit<<=1)if(pgm_read_byte(addr)>c) linebuffer[y0]|=bit;
+	for(;x0!=x1+1;x0++,addr++,bit<<=1)if(pgm_read_byte(addr)<c) linebuffer[y0]|=bit;
 }
 
 #ifdef ENABLE_CIRCLES
