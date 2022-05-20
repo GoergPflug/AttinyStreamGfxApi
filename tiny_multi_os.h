@@ -632,7 +632,12 @@ int main()
 	cli();
 	I2C_DDR=0;
 	I2C_PORT=255;  // input + pullup
+
+#ifdef ENABLE_ATTINY_POWER_MANAGER
 	PRR=0b1100;   // disable timer, adc
+#endif
+
+	
 	MCUCR|=0x80; // disable brownout
 	ACSR|=0x80;
 	
