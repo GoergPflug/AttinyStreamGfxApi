@@ -12,6 +12,7 @@ THIS SOFTWARE IS PROVIDED BY THE Görg Pflug, CPKI Gmbh AND CONTRIBUTORS “AS I
 
 		
 */
+
 #ifndef F_CPU 
 #define F_CPU 16000000
 #warning "CPU Clock: assuming 16mhz"
@@ -28,6 +29,8 @@ THIS SOFTWARE IS PROVIDED BY THE Görg Pflug, CPKI Gmbh AND CONTRIBUTORS “AS I
 #include <avr/boot.h>
 #include <avr/interrupt.h>
 #include <string.h>
+#include <avr/power.h>
+#include <util/delay.h>
 
 #define s8 signed char
 #define u8 unsigned char
@@ -35,7 +38,8 @@ THIS SOFTWARE IS PROVIDED BY THE Görg Pflug, CPKI Gmbh AND CONTRIBUTORS “AS I
 #define u16 unsigned int
 
 #define SSD1306_ADDRESS 0x78
-
+#define I2C_PORT PORTB
+#define I2C_DDR DDRB
 #define PIN_SDA  0
 #define PIN_SCL 2
 
@@ -44,7 +48,6 @@ static inline int GfxApiPosition(unsigned char x, unsigned char y)
 {
 	return x*64+y;
 }
-
 
 #ifdef ENABLE_LINEDRAWING
 u8 _gfx_linepos= 0;
@@ -63,7 +66,6 @@ u8 _gfx_circlepos=0;
 #define NR_CIRCLES 0
 #endif
 static unsigned char _gfx_points_of_lines[4 * NR_LINES+ 8 * NR_TRIS+4*NR_CIRCLES];
-
 
 // Start storage of Line Points
 static void GfxApiBeginLines()
@@ -130,9 +132,10 @@ static void GfxApiStoreTrianglePoint(unsigned char x1, unsigned char y1)
 	_gfx_tripos += 2;
 }
 #endif
+#endif
+#ifdef ENABLE_LINEDRAWING
 static unsigned char _cur_seg=0;
 #endif
-
 
 void ApiIntToHex(u16 in, u8 *out);
 u8 ApiCharToFontIndex(u8 c);
@@ -158,8 +161,14 @@ typedef struct GfxApiCompressedLayer
 static s8 os_gfx_layer_read_vlc(GfxApiCompressedLayer *g);
 static void os_gfx_start_display_transfer();
 static void os_i2c_start (void);
-static inline void os_i2c_sda_low (void);
-static inline void os_i2c_scl_release (void);
+
+#define os_i2c_scl_low()	do{ I2C_DDR |= (1<<PIN_SCL);} while (0)
+#define os_i2c_sda_low()	do{	I2C_DDR |= (1<<PIN_SDA);} while(0)
+#define os_i2c_sda_high()	do {I2C_DDR &= ~(1<<PIN_SDA);} while(0)
+#define os_i2c_scl_high() 	do{ I2C_DDR &= ~(1<<PIN_SCL); } while(0)
+#define os_i2c_dbg_high() 	do{ I2C_DDR &= ~(1<<5); } while(0)
+#define os_i2c_dbg_low()    do{I2C_DDR |= (1<<5);} while (0)
+
 void os_i2c_init (void);
 static void os_i2c_write (const u8 *buf, u8 len);
 
@@ -206,35 +215,36 @@ const u8 os_font[] __attribute__((progmem)) = {
 #endif
 
 #ifndef ENABLE_WIRE
-static inline void os_i2c_scl_release (void)
-{
-	PORTB |= _BV(PIN_SCL);
-}
 
-static inline void os_i2c_scl_low (void)
-{
-	PORTB &= ~_BV(PIN_SCL);
-}
 
-static inline void os_i2c_sda_release (void)
+/*
+static inline void os_i2c_scl_high (void)
 {
-	USIDR |= 0x80;
+	 I2C_DDR &= ~(1<<PIN_SCL);
+	//I2C_PORT |= _BV(PIN_SCL);
 }
+*/
 
-static inline void os_i2c_sda_low (void)
-{
-	USIDR &= ~0x80;
-}
 #endif
 static void os_i2c_start (void)
 {
 #ifndef ENABLE_WIRE
-	os_i2c_scl_release();
+	os_i2c_scl_high();
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");					
 	os_i2c_sda_low();
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");						
 	os_i2c_scl_low();
-	os_i2c_sda_release();
-
-	USISR = _BV(USISIF);
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	os_i2c_sda_high();
 #else
 
 #endif
@@ -243,10 +253,26 @@ static void os_i2c_start (void)
 static void os_i2c_stop (void)
 {
 #ifndef ENABLE_WIRE
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
 	os_i2c_sda_low();
-	os_i2c_scl_release();
-	os_i2c_sda_release();
-	USISR = _BV(USIPF);
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+
+	os_i2c_scl_high();
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	os_i2c_sda_high();
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
 #else
 	Wire.endTransmission();
 #endif
@@ -256,16 +282,55 @@ static void os_i2c_stop (void)
 static void os_i2c_write_byte (u8 byte)
 {
 #ifndef ENABLE_WIRE
-	USIDR = byte;
-	USISR = 7;
-	do {
-		os_i2c_scl_release();
-		os_i2c_scl_low();
-		USICR |= _BV(USICLK);
-	}
-	while (USISR & 0x0F);
+	//USIDR = byte;
+	//USISR = 7;
+	u8 bitpos=0x80;
 	
-	USIDR |= 0x80;   // = os_i2c_sda_release();
+	do {
+		if(byte&bitpos)
+			os_i2c_sda_high();
+		else
+		{
+			os_i2c_sda_low();
+			asm volatile("nop");
+			asm volatile("nop");
+			asm volatile("nop");
+		}
+		os_i2c_scl_high();
+		asm volatile("nop");
+		asm volatile("nop");
+		asm volatile("nop");
+		os_i2c_scl_low();
+		bitpos>>=1;
+//		USICR |= _BV(USICLK);
+	//	bitpos>>=1;
+	} while (bitpos);
+	//while (USISR & 0x0F);
+	
+	os_i2c_sda_high();						 
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+
+	os_i2c_scl_high();
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+
+	os_i2c_scl_low();
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+	asm volatile("nop");
+
 #else
 	Wire.write(byte);
 #endif
@@ -274,11 +339,24 @@ static void os_i2c_write_byte (u8 byte)
 void os_i2c_init (void)
 {
 #ifndef ENABLE_WIRE
-	PORTB = _BV(PIN_SDA) | _BV(PIN_SCL);
-	DDRB  = _BV(PIN_SDA) | _BV(PIN_SCL);
-	USICR = _BV(USIWM1) | _BV(USICLK);
-	os_i2c_scl_release();
-	os_i2c_sda_release();
+	I2C_PORT = 0;//_BV(PIN_SDA) | _BV(PIN_SCL);
+	//I2C_DDR  = _BV(PIN_SDA) | _BV(PIN_SCL);
+	os_i2c_scl_high();
+							 asm volatile("nop");
+							 asm volatile("nop");
+							 asm volatile("nop");
+							 asm volatile("nop");
+							 asm volatile("nop");
+							 asm volatile("nop");
+
+	os_i2c_sda_high();
+							 asm volatile("nop");
+							 asm volatile("nop");
+							 asm volatile("nop");
+							 asm volatile("nop");
+							 asm volatile("nop");
+							 asm volatile("nop");
+
 #else
 	Wire.begin();
 	Wire.setClock(400000);
@@ -370,39 +448,6 @@ void _reorder_lines()
 #pragma GCC push_options
 #ifndef DISABLE_OFAST
 #pragma GCC optimize ("Ofast")
-#endif
-#ifndef ENABLE_WIRE
-static inline void __attribute__((always_inline)) one_i2c_bit_byte (u8 byte)
-{
-	USIDR = byte;
-	USISR = 7;
-}
-
-
-static inline __attribute__((always_inline)) void one_i2c_bit_1()
-{
-	 asm volatile("nop");
-	 asm volatile("nop");
-	 asm volatile("nop");
-	 asm volatile("nop");
-
-	// os_i2c_scl_release
-	//PORTB |= _BV(PIN_SCL);
-	//	os_i2c_scl_low();
-	PORTB &= ~_BV(PIN_SCL);
-	USICR |= _BV(USICLK);
-}
-
-
-static inline __attribute__((always_inline)) void one_i2c_bit_0()
-{
-	// os_i2c_scl_release
-	PORTB |= _BV(PIN_SCL);
-	//	os_i2c_scl_low();
-	//	PORTB &= ~_BV(PIN_SCL);
-	//	USICR |= _BV(USICLK);
-
-}
 #endif
 static u8 os_gfx_read_bit (GfxApiCompressedLayer *g)
 {
@@ -529,7 +574,7 @@ void os_init_ssd1306 (void)
 	// brigher screen init:
 #ifndef ENABLE_DARKER_SCREEN	
 	const u8 init1306[]={
-	 0,0xAE,0xD5, 0x80, 0xA8, 0x3F,0xD3, 0x0,0x40,0x8D, 0x14, 0x20, 0x01, 0xA1, 0xC8, 0xDA, 0x12, 0x81, 0x7F, 0xD9, 0xF1, 0xDB, 0x40,  0xA4,0xA6,0xAF
+	 0,0xe4,0xAE,0xD5, 0x80, 0xA8, 0x3F,0xD3, 0x0,0x40,0x8D, 0x14, 0x20, 0x01, 0xA1, 0xC8, 0xDA, 0x12, 0x81, 0x7F, 0xD9, 0xF1, 0xDB, 0x40,  0xA4,0xA6,0xAF
 	};
 #else
 	// darker screen init:
@@ -585,8 +630,8 @@ extern void MainTask();
 int main()
 {
 	cli();
-	DDRB=0;
-	PORTB=255;  // input + pullup
+	I2C_DDR=0;
+	I2C_PORT=255;  // input + pullup
 	PRR=0b1100;   // disable timer, adc
 	MCUCR|=0x80; // disable brownout
 	ACSR|=0x80;
@@ -618,9 +663,10 @@ ISR(WDT_vect)
 }
 u16 bat_volt=5200;
 u8 low_power_screen_disable=0;
+s8 _br=15;
 #define bit_is_set(sfr, bit) (_SFR_BYTE(sfr) & _BV(bit))
 
-void _manage_battery() {
+int _manage_battery() {
 	static u8 phase=0;
 	if(phase==1)
 	{
@@ -667,7 +713,7 @@ void _manage_battery() {
 		return bat_volt;
 	}
 	PRR|=1;
-	if(bat_volt<2800)
+	if(bat_volt<2000)
 	{
 		if(!low_power_screen_disable)
 		{
@@ -679,6 +725,8 @@ void _manage_battery() {
 				0x10
 			};
 			os_i2c_write(disable_charge_pump, sizeof(disable_charge_pump));
+			
+			clock_prescale_set(clock_div_256);
 		}
 		low_power_screen_disable=10;
 	}
@@ -686,35 +734,43 @@ void _manage_battery() {
 	{
 		if(bat_volt<POWER_MANAGER_LOW_POWER)
 		{
-			if(!low_power_screen_disable)
-			{
-				u8 br=0;
-#ifdef ENABLE_POWER_MANGER_FADE
-				int nbr=1023-(POWER_MANAGER_LOW_POWER-bat_volt);
-				if(nbr<0)nbr=0;
-				nbr>>=6;
-				br=nbr;
-#endif				
 			
-			GfxApiSetBrightness(0);
-			}
-			sleep_cpu();
-			os_i2c_init();  // bring usi back....
-
+			if(bat_volt<POWER_MANAGER_LOW_POWER-50)
+			_br-=1;
+			if(_br<0)_br=0;	
+		//	sleep_cpu();
+		//	os_i2c_init();  // bring usi back....
 		}
 		else
-			GfxApiSetBrightness(15);
-			
+		{	
+			if(bat_volt>POWER_MANAGER_LOW_POWER+50)
+			{
+				_br++;
+				if(_br>15)_br=15;
+			}
+		}
+		_br=15;
+		GfxApiSetBrightness(_br);
+
 		if(low_power_screen_disable)
 		{
-			
-			if(bat_volt>POWER_MANAGER_LOW_POWER)
+			sleep_cpu();
+			if(bat_volt>3300)
 			{
 				sleep_cpu();
 				low_power_screen_disable--;
 				if(!low_power_screen_disable)
 				{
-					os_i2c_init();					
+					const u8 reset[]={
+						0,
+						0xe4 // undocumented command, said to help startup if display is "confused"
+					};
+					clock_prescale_set(clock_div_1);
+
+					_delay_ms(500);
+					for (int i=0;i<18;i++)
+						os_i2c_stop();
+				
 					os_init_ssd1306();
 				}
 			}
@@ -723,6 +779,4 @@ void _manage_battery() {
 	phase++;
 	if(phase==10)phase=0;
 }
-
-
 #endif
