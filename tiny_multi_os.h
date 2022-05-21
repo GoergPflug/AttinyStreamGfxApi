@@ -42,7 +42,6 @@ THIS SOFTWARE IS PROVIDED BY THE Görg Pflug, CPKI Gmbh AND CONTRIBUTORS “AS I
 #define I2C_DDR DDRB
 #define PIN_SDA  0
 #define PIN_SCL 2
-
 // helper function, Calculate Skip Counter from x,y coord
 static inline int GfxApiPosition(unsigned char x, unsigned char y)
 {
@@ -585,6 +584,8 @@ void os_init_ssd1306 (void)
 	os_i2c_write(init1306, sizeof(init1306));
 }
 
+
+
 // set the brightness of the screen 0 to 15
 void GfxApiSetBrightness (u8 brightness)
 {
@@ -599,6 +600,21 @@ void GfxApiSetBrightness (u8 brightness)
 	};
 	os_i2c_write(init1306, sizeof(init1306));
 }
+
+// set the brightness of the screen 0 to 15
+void GfxApiSetFreq (u8 freq)
+{	
+	u16 a=(1+freq/2)<<4;
+	a|=15-freq;
+	
+	const u8 init1306[]={
+		0,
+		0xd5,a 
+	};
+	os_i2c_write(init1306, sizeof(init1306));
+}
+
+
 
 void GfxApiSetDisplayEnable (u8 e)
 {
@@ -632,12 +648,7 @@ int main()
 	cli();
 	I2C_DDR=0;
 	I2C_PORT=255;  // input + pullup
-
-#ifdef ENABLE_ATTINY_POWER_MANAGER
 	PRR=0b1100;   // disable timer, adc
-#endif
-
-	
 	MCUCR|=0x80; // disable brownout
 	ACSR|=0x80;
 	
