@@ -358,7 +358,7 @@ void os_i2c_init (void)
 
 #else
 	Wire.begin();
-	Wire.setClock(400000);
+	Wire.setClock(800000);
 #endif
 }
 
