@@ -102,7 +102,7 @@ static u8 pixelxy(u8 x, u8 y)
 			{
 				int c=i*8;
 				int r;
-				for(r=h;r<v;r++)ctab[r]=c;
+				for(r=h;r<v;r++)ctab[r]=c,c-=2;
 				h=v;
 			}
 			int m[8]={-5,-3,-2,-1,4,2,7,8};
