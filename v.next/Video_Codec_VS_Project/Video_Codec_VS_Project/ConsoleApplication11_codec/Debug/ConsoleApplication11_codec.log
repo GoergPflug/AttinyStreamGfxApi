@@ -1,0 +1,18 @@
+﻿  ConsoleApplication11_codec.cpp
+c:\users\lenovo\source\repos\consoleapplication11_codec\consoleapplication11_codec\consoleapplication11_codec.cpp(475): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+c:\users\lenovo\source\repos\consoleapplication11_codec\consoleapplication11_codec\consoleapplication11_codec.cpp(515): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+c:\users\lenovo\source\repos\consoleapplication11_codec\consoleapplication11_codec\consoleapplication11_codec.cpp(740): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+c:\users\lenovo\source\repos\consoleapplication11_codec\consoleapplication11_codec\consoleapplication11_codec.cpp(1107): warning C4244: "Initialisierung": Konvertierung von "double" in "int", möglicher Datenverlust
+c:\users\lenovo\source\repos\consoleapplication11_codec\consoleapplication11_codec\consoleapplication11_codec.cpp(1108): warning C4244: "Initialisierung": Konvertierung von "double" in "int", möglicher Datenverlust
+c:\users\lenovo\source\repos\consoleapplication11_codec\consoleapplication11_codec\consoleapplication11_codec.cpp(1112): warning C4244: "Initialisierung": Konvertierung von "double" in "float", möglicher Datenverlust
+c:\users\lenovo\source\repos\consoleapplication11_codec\consoleapplication11_codec\consoleapplication11_codec.cpp(1114): warning C4244: "=": Konvertierung von "float" in "unsigned char", möglicher Datenverlust
+c:\users\lenovo\source\repos\consoleapplication11_codec\consoleapplication11_codec\consoleapplication11_codec.cpp(1291): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+c:\users\lenovo\source\repos\consoleapplication11_codec\consoleapplication11_codec\consoleapplication11_codec.cpp(1443): warning C4101: "wtext": Unreferenzierte lokale Variable
+c:\users\lenovo\source\repos\consoleapplication11_codec\consoleapplication11_codec\consoleapplication11_codec.cpp(1598): warning C4244: "=": Konvertierung von "double" in "unsigned char", möglicher Datenverlust
+c:\users\lenovo\source\repos\consoleapplication11_codec\consoleapplication11_codec\consoleapplication11_codec.cpp(1779): warning C4091: "typedef ": Ignoriert auf der linken Seite von "vq", wenn keine Variable deklariert wurde
+c:\users\lenovo\source\repos\consoleapplication11_codec\consoleapplication11_codec\consoleapplication11_codec.cpp(1655): warning C4101: "r": Unreferenzierte lokale Variable
+c:\users\lenovo\source\repos\consoleapplication11_codec\consoleapplication11_codec\consoleapplication11_codec.cpp(1730): warning C4101: "yy": Unreferenzierte lokale Variable
+c:\users\lenovo\source\repos\consoleapplication11_codec\consoleapplication11_codec\consoleapplication11_codec.cpp(1719): warning C4101: "r": Unreferenzierte lokale Variable
+c:\users\lenovo\source\repos\consoleapplication11_codec\consoleapplication11_codec\consoleapplication11_codec.cpp(1767): warning C4244: "=": Konvertierung von "double" in "int", möglicher Datenverlust
+c:\users\lenovo\source\repos\consoleapplication11_codec\consoleapplication11_codec\consoleapplication11_codec.cpp(1960): warning C4101: "tmp": Unreferenzierte lokale Variable
+  ConsoleApplication11_codec.vcxproj -> C:\Users\Lenovo\source\repos\ConsoleApplication11_codec\Debug\ConsoleApplication11_codec.exe

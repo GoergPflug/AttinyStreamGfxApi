@@ -1,0 +1,29 @@
+﻿  ConsoleApplication11_codec.cpp
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(525): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(565): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(790): warning C4018: "<": Konflikt zwischen "signed" und "unsigned"
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(1169): warning C4244: "Initialisierung": Konvertierung von "double" in "int", möglicher Datenverlust
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(1170): warning C4244: "Initialisierung": Konvertierung von "double" in "int", möglicher Datenverlust
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(1177): warning C4244: "=": Konvertierung von "double" in "unsigned char", möglicher Datenverlust
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(1760): warning C4309: "=": Verkürzung eines konstanten Wertes
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(1799): warning C4309: "=": Verkürzung eines konstanten Wertes
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(1925): warning C4309: "=": Verkürzung eines konstanten Wertes
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(1956): warning C4309: "=": Verkürzung eines konstanten Wertes
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(2075): warning C4309: "=": Verkürzung eines konstanten Wertes
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(2106): warning C4309: "=": Verkürzung eines konstanten Wertes
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(2210): warning C4309: "=": Verkürzung eines konstanten Wertes
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(2234): warning C4309: "=": Verkürzung eines konstanten Wertes
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(2276): warning C4244: "=": Konvertierung von "double" in "unsigned char", möglicher Datenverlust
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(2289): warning C4244: "=": Konvertierung von "double" in "BYTE", möglicher Datenverlust
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(2291): warning C4244: "return": Konvertierung von "double" in "int", möglicher Datenverlust
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(2379): warning C4244: "=": Konvertierung von "LRESULT" in "int", möglicher Datenverlust
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(2411): warning C4326: Der Rückgabetyp von "main" sollte "int" und nicht "void" sein
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(2413): warning C4101: "i": Unreferenzierte lokale Variable
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(2412): warning C4101: "frame": Unreferenzierte lokale Variable
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(2649): warning C4091: "typedef ": Ignoriert auf der linken Seite von "vq", wenn keine Variable deklariert wurde
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(2532): warning C4244: "=": Konvertierung von "double" in "unsigned char", möglicher Datenverlust
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(2591): warning C4244: "Initialisierung": Konvertierung von "double" in "int", möglicher Datenverlust
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(2550): warning C4101: "yy": Unreferenzierte lokale Variable
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(2545): warning C4101: "r": Unreferenzierte lokale Variable
+c:\attinystreamgfxapi-main\video_codec_vs_project\consoleapplication11_codec\consoleapplication11_codec.cpp(2772): warning C4101: "tmp": Unreferenzierte lokale Variable
+  ConsoleApplication11_codec.vcxproj -> C:\AttinyStreamGfxApi-main\Video_Codec_VS_Project\x64\Debug\ConsoleApplication11_codec.exe

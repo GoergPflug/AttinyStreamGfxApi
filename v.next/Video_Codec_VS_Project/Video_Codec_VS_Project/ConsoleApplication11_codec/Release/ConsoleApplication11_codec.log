@@ -1,0 +1,2 @@
+﻿cl : Befehlszeile warning D9025: "/sdl" wird durch "/GS-" überschrieben
+cl : Befehlszeile error D8016: Die Befehlszeilenoptionen /clr und /Gv sind inkompatibel.
