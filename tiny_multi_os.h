@@ -1,7 +1,7 @@
-/* CPKI AttinyGfxApi & TinyMultiOs, Preview Version 0.9
+/* CPKI AttinyGfxApi & TinyMultiOs, Preview Version 0.9.1bugfix1
 see
 https://www.youtube.com/watch?v=WNJQXsJqSbM
-Copyright (c) 2002
+Copyright (c) 2023
 Görg Pflug & CPKI Gmbh, www.cpki.de . All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
@@ -552,6 +552,12 @@ static void os_gfx_start_display_transfer()
 	os_i2c_write_byte(0x21);
 	os_i2c_write_byte(0x0);
 	os_i2c_write_byte(0x7f);
+	
+  	os_i2c_write_byte(0x22); // bugfix 
+	os_i2c_write_byte(0x0);
+	os_i2c_write_byte(0x7);
+
+
 	os_i2c_stop();
 	os_i2c_start();
 	os_i2c_write_byte(SSD1306_ADDRESS);
@@ -563,6 +569,13 @@ static void os_gfx_start_display_transfer()
 	Wire.write(0x21);
 	Wire.write(0x0);
 	Wire.write(0x7f);
+	
+	Wire.write(0x22);
+	Wire.write(0x0);
+	Wire.write(0x7);
+	
+	
+	
 	Wire.endTransmission();
 	Wire.beginTransmission(WIRE_SCREEN_ADDRESS);
 	Wire.write(0x40);
