@@ -1,0 +1,3 @@
+﻿  LayerMaker2.cpp
+c:\current\layermaker2\layermaker2\layermaker2\layermaker2.cpp(353): warning C4244: "=": Konvertierung von "double" in "unsigned char", möglicher Datenverlust
+  LayerMaker2.vcxproj -> C:\current\layermaker2\LayerMaker2\Debug\LayerMaker2.exe
